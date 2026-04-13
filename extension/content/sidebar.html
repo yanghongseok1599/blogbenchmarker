@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLOG BenchMarker</title>
+  <link rel="stylesheet" href="content.css" />
+  <style>
+    /* 사이드바 iframe 내부 전용 — content.css의 :host 토큰은 Shadow DOM 한정이므로
+       iframe 문서 자체에서는 사용할 수 없다. 최소한의 표면만 수작업 정의한다. */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background: #ffffff;
+      color: #0f172a;
+    }
+    .bbm-side {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 16px 16px 24px;
+      gap: 16px;
+      overflow-y: auto;
+    }
+    .bbm-side-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .bbm-side-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .bbm-side-status {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .bbm-side-status[data-state="analyzing"] { color: #2563eb; }
+    .bbm-side-status[data-state="error"] { color: #dc2626; }
+    .bbm-side-status[data-state="ok"] { color: #16a34a; }
+
+    .bbm-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+      background: #fafafa;
+    }
+    .bbm-card-title {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .bbm-card-value {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .bbm-card-hint {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .bbm-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bbm-section-title {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+    .bbm-slot {
+      font-size: 13px;
+      color: #475569;
+      min-height: 20px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .bbm-empty {
+      color: #94a3b8;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="bbm-side" role="region" aria-label="BLOG BenchMarker 분석 결과">
+    <header class="bbm-side-header">
+      <h1 class="bbm-side-title">실시간 분석</h1>
+      <span id="bbm-status" class="bbm-side-status" data-state="idle" aria-live="polite">대기 중</span>
+    </header>
+
+    <!-- 종합 점수 카드 — Phase 3.1 analyzer가 채움 -->
+    <section class="bbm-card" aria-label="종합 SEO 점수">
+      <p class="bbm-card-title">SEO 점수</p>
+      <p id="bbm-score" class="bbm-card-value">—</p>
+      <p id="bbm-score-hint" class="bbm-card-hint">글을 작성하면 자동으로 분석합니다.</p>
+    </section>
+
+    <!-- 기본 지표 -->
+    <section class="bbm-section" aria-label="기본 지표">
+      <h2 class="bbm-section-title">기본 지표</h2>
+      <div class="bbm-slot" id="bbm-slot-basic">
+        <span class="bbm-empty">아직 분석 결과가 없습니다.</span>
+      </div>
+    </section>
+
+    <!-- 후킹 -->
+    <section class="bbm-section" aria-label="첫 문장 후킹">
+      <h2 class="bbm-section-title">첫 문장 후킹</h2>
+      <div class="bbm-slot" id="bbm-slot-hook">
+        <span class="bbm-empty">분석 대기 중</span>
+      </div>
+    </section>
+
+    <!-- 개선 제안 -->
+    <section class="bbm-section" aria-label="개선 제안">
+      <h2 class="bbm-section-title">개선 제안</h2>
+      <div class="bbm-slot" id="bbm-slot-suggestions">
+        <span class="bbm-empty">분석 대기 중</span>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="sidebar.js"></script>
+</body>
+</html>

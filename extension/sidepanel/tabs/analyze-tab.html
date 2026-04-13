@@ -1,0 +1,35 @@
+<!--
+  analyze-tab.html — Phase 3.3 분석 탭 마크업 참조본
+  ────────────────────────────────────────────────────────────
+  본 파일은 panel.html 에 직접 include 되지 않는다. (MV3 골격에 HTML include
+  메커니즘이 없고, 안전 규칙(chrome-extension-security §3-1) 상 raw HTML 의
+  속성 기반 삽입 경로가 금지되어 있기 때문이다.)
+
+  실제 DOM 은 sidepanel/tabs/analyze-tab.js 의 buildAnalyzeTabDOM() 이 dom-safe
+  헬퍼(createEl)로 동등하게 조립한다. 본 파일은 인간 리뷰·구조 추적·테스트
+  스냅샷 기준으로만 사용한다.
+-->
+<section class="bm-analyze" data-tab-content="analyze">
+
+  <header class="bm-analyze__head">
+    <p class="bm-analyze__hint">
+      네이버 블로그 글 페이지에서 “분석 시작”을 누르세요.
+    </p>
+    <button type="button" class="bm-btn bm-btn--primary" data-action="analyze-start">
+      분석 시작
+    </button>
+  </header>
+
+  <div class="bm-analyze__status" data-role="status" hidden>
+    <!-- 진행 / 에러 메시지 슬롯 (textContent 로만 갱신) -->
+  </div>
+
+  <div class="bm-analyze__summary" data-role="summary" hidden>
+    <!-- 총점 + URL/제목 요약 슬롯. 분석 완료 후 채워짐 -->
+  </div>
+
+  <div class="bm-analyze__results" data-role="results">
+    <!-- score-card 컴포넌트가 N개 append 되는 컨테이너 -->
+  </div>
+
+</section>

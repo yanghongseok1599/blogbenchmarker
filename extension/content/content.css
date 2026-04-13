@@ -1,0 +1,106 @@
+/* extension/content/content.css
+ * 사이드바 Shadow DOM 내부 전용 스타일 — host page로 새어나가지 않는다.
+ * (Shadow DOM encapsulation이 주 방어선. 보조적으로 :host 사용.)
+ *
+ * 디자인 토큰(사이드바 격리용):
+ *   --bbm-bg: 사이드바 배경
+ *   --bbm-fg: 본문 색
+ *   --bbm-border: 경계선
+ *   --bbm-accent: 강조색
+ *   --bbm-width: 펼침 너비
+ *   --bbm-collapsed-width: 접힘 너비
+ *   --bbm-shadow: 그림자
+ *   --bbm-z: z-index (네이버 레이어 위)
+ */
+
+:host {
+  all: initial;
+  --bbm-bg: #ffffff;
+  --bbm-fg: #0f172a;
+  --bbm-muted: #64748b;
+  --bbm-border: #e2e8f0;
+  --bbm-accent: #2563eb;
+  --bbm-width: 360px;
+  --bbm-collapsed-width: 44px;
+  --bbm-shadow: 0 6px 24px rgba(15, 23, 42, 0.12);
+  --bbm-z: 2147483000; /* 네이버 레이어(약 2,147,482,999 추정) 위 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+#bbm-sidebar {
+  position: fixed;
+  top: 72px;
+  right: 0;
+  width: var(--bbm-width);
+  height: calc(100vh - 96px);
+  max-height: 720px;
+  background: var(--bbm-bg);
+  color: var(--bbm-fg);
+  border-left: 1px solid var(--bbm-border);
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  box-shadow: var(--bbm-shadow);
+  z-index: var(--bbm-z);
+  display: flex;
+  flex-direction: column;
+  transition: transform 160ms ease, width 160ms ease;
+  transform: translateX(0);
+}
+
+#bbm-sidebar[data-collapsed="true"] {
+  width: var(--bbm-collapsed-width);
+  transform: translateX(calc(var(--bbm-width) - var(--bbm-collapsed-width)));
+}
+
+#bbm-sidebar[data-collapsed="true"] #bbm-sidebar-frame {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#bbm-sidebar-toggle {
+  position: absolute;
+  top: 12px;
+  left: -28px;
+  width: 28px;
+  height: 56px;
+  border: 1px solid var(--bbm-border);
+  border-right: 0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  background: var(--bbm-bg);
+  color: var(--bbm-accent);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: var(--bbm-shadow);
+  padding: 0;
+}
+
+#bbm-sidebar-toggle:hover {
+  background: #f8fafc;
+}
+
+#bbm-sidebar-frame {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  background: transparent;
+  transition: opacity 120ms ease;
+}
+
+/* 좁은 뷰포트(<1280px) — 자동 접힘 힌트 */
+@media (max-width: 1280px) {
+  #bbm-sidebar:not([data-collapsed="true"]) {
+    width: 320px;
+  }
+}
