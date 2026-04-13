@@ -1,0 +1,50 @@
+<!--
+  benchmark-tab.html — Phase 4.1 벤치마크 탭 마크업 참조본
+  ────────────────────────────────────────────────────────────
+  본 파일은 panel.html 에 include 되지 않는다. 실제 DOM 은 sidepanel/tabs/benchmark-tab.js
+  의 buildBenchmarkTabDOM() 이 dom-safe.createEl 로 동등하게 조립한다.
+  (MV3 에 HTML include 메커니즘이 없고, 속성 기반 raw HTML 삽입은 chrome-extension-security
+  §3-1 로 금지됨.)
+  인간 리뷰·구조 추적·테스트 스냅샷 기준으로만 사용한다.
+-->
+<section class="bm-benchmark" data-tab-content="benchmark">
+
+  <header class="bm-benchmark__head">
+    <h2 class="bm-benchmark__title">즐겨찾기 블로거</h2>
+    <p class="bm-benchmark__hint">
+      벤치마킹할 네이버 블로그 URL 을 추가하세요.
+      예) https://blog.naver.com/example
+    </p>
+  </header>
+
+  <form class="bm-benchmark__form" data-role="add-form" autocomplete="off">
+    <input
+      type="url"
+      class="bm-input"
+      name="blog-url"
+      data-role="url-input"
+      placeholder="https://blog.naver.com/..."
+      required
+    />
+    <button
+      type="submit"
+      class="bm-btn bm-btn--primary"
+      data-action="benchmark-add"
+    >
+      추가
+    </button>
+  </form>
+
+  <div class="bm-benchmark__status" data-role="status" hidden role="status" aria-live="polite">
+    <!-- 진행/에러 메시지 슬롯 (textContent 로만 갱신) -->
+  </div>
+
+  <ul class="bm-benchmark__list" data-role="list">
+    <!-- 블로그 항목 <li class="bm-benchmark__item"> 가 N개 append 됨 -->
+  </ul>
+
+  <p class="bm-benchmark__empty" data-role="empty" hidden>
+    아직 등록된 블로그가 없습니다.
+  </p>
+
+</section>

@@ -6,6 +6,11 @@
 //   - 모듈 스코프 상태 최소화 — SW 는 idle 시 재시작된다
 
 import { routes, bootTasks } from './handlers/index.js'
+import {
+  ensureBenchmarkAlarm,
+  handleBenchmarkAlarm,
+  BENCHMARK_ALARM_NAME,
+} from './schedulers/benchmark-sync.js'
 
 /**
  * 메시지 sender 가 신뢰 가능한 확장 내부 컨텍스트인지 검증.
@@ -49,14 +54,28 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return true
 })
 
-// 설치 시 사이드패널 동작 설정.
+// 설치 시 사이드패널 동작 설정 + 벤치마킹 알람 등록.
 chrome.runtime.onInstalled.addListener(() => {
   if (chrome.sidePanel?.setPanelBehavior) {
     chrome.sidePanel
       .setPanelBehavior({ openPanelOnActionClick: true })
       .catch(() => { /* 일부 환경 미지원 무시 */ })
   }
+  ensureBenchmarkAlarm().catch((e) =>
+    console.warn('[service-worker] benchmark alarm 등록 실패', e?.message),
+  )
 })
+
+// 알람 발화 라우팅 — 신규 알람은 여기서 분기 추가.
+if (chrome.alarms?.onAlarm) {
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm?.name === BENCHMARK_ALARM_NAME) {
+      handleBenchmarkAlarm(alarm).catch((e) =>
+        console.warn('[service-worker] benchmark alarm 처리 실패', e?.message),
+      )
+    }
+  })
+}
 
 // SW 부팅 시 1회 초기화 훅 실행 (예: auth 상태 브로드캐스트 구독).
 // 각 훅은 자체적으로 에러를 삼키지만, 외부에서도 한 번 더 방어한다.

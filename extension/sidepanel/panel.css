@@ -52,3 +52,92 @@ html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFo
 .bm-progress__fill--fair { background: #ca8a04; }
 .bm-progress__fill--poor { background: #dc2626; }
 .bm-progress__value { font-size: 11px; color: #666; min-width: 32px; text-align: right; }
+
+/* ─── Phase 4.3 통계/비교 뷰 ─── */
+
+/* bar-chart SVG 래퍼 */
+.bm-chart { display: block; width: 100%; }
+.bm-chart--bar { max-width: 100%; }
+
+/* word-cloud */
+.bm-wordcloud { background: #fff; border: 1px solid #eee; border-radius: 8px; }
+.bm-wordcloud__empty { color: #94a3b8; font-size: 12px; margin: 0; padding: 16px; text-align: center; }
+.bm-wordcloud__item { cursor: default; }
+
+/* comparison-card */
+.bm-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+}
+.bm-compare__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.bm-compare__side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+.bm-compare__side-header { display: flex; flex-direction: column; gap: 2px; }
+.bm-compare__side-label { margin: 0; font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.bm-compare__side-title { margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bm-compare__score { display: flex; align-items: baseline; justify-content: space-between; padding: 8px; background: #fff; border-radius: 6px; }
+.bm-compare__score-label { font-size: 11px; color: #64748b; }
+.bm-compare__score-value { font-size: 20px; font-weight: 700; color: #0f172a; }
+.bm-compare__metrics { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; font-size: 12px; }
+.bm-compare__metric-key { margin: 0; color: #64748b; }
+.bm-compare__metric-val { margin: 0; color: #0f172a; font-weight: 600; text-align: right; }
+.bm-compare__hook { margin: 4px 0 0; font-size: 12px; }
+.bm-compare__hook-label { color: #64748b; }
+.bm-compare__hook-value { color: #0f172a; font-weight: 600; }
+.bm-compare__keywords-wrap { display: flex; flex-direction: column; gap: 4px; }
+.bm-compare__keywords-label { margin: 0; font-size: 11px; color: #64748b; font-weight: 600; }
+.bm-compare__keywords { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+.bm-compare__keyword { padding: 2px 6px; background: #eef2ff; color: #3730a3; font-size: 11px; border-radius: 999px; }
+
+.bm-compare__delta { padding: 10px; background: #f8fafc; border-radius: 6px; }
+.bm-compare__delta-title { margin: 0 0 6px; font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.bm-compare__delta-grid { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; font-size: 12px; }
+.bm-compare__delta-key { margin: 0; color: #475569; }
+.bm-compare__delta-val { margin: 0; text-align: right; font-weight: 700; }
+.bm-compare__delta-val--good { color: #16a34a; }
+.bm-compare__delta-val--poor { color: #dc2626; }
+.bm-compare__delta-val--neutral { color: #64748b; }
+.bm-compare__empty { margin: 0; padding: 16px; text-align: center; color: #94a3b8; font-size: 12px; }
+
+/* benchmark-stats-section */
+.bm-stats { display: flex; flex-direction: column; gap: 14px; }
+.bm-stats__header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.bm-stats__title { margin: 0; font-size: 14px; font-weight: 700; color: #0f172a; }
+.bm-stats__subtitle { margin: 0; font-size: 11px; color: #64748b; }
+.bm-stats__section-title { margin: 0 0 6px; font-size: 12px; font-weight: 600; color: #334155; }
+.bm-stats__metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.bm-stats__metric { padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; display: flex; flex-direction: column; gap: 2px; }
+.bm-stats__metric-label { margin: 0; font-size: 11px; color: #64748b; }
+.bm-stats__metric-value { margin: 0; font-size: 18px; font-weight: 700; color: #0f172a; }
+.bm-stats__metric-hint { margin: 0; font-size: 10px; color: #94a3b8; line-height: 1.3; }
+.bm-stats__chart-wrap,
+.bm-stats__kw-wrap {
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+.bm-stats__loading,
+.bm-stats__empty { margin: 0; padding: 16px; text-align: center; color: #888; font-size: 12px; }
+.bm-stats__error { padding: 10px; background: #fef2f2; color: #b91c1c; border-radius: 6px; font-size: 12px; }
+
+@media (max-width: 320px) {
+  .bm-compare__grid { grid-template-columns: 1fr; }
+  .bm-stats__metrics { grid-template-columns: 1fr; }
+}

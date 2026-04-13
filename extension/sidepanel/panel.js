@@ -9,7 +9,11 @@ const tabActivators = {
     const mod = await import("./tabs/analyze-tab.js");
     mod.mountAnalyzeTab(panelEl);
   },
-  // benchmark/generate/mypage 는 후속 Phase 에서 등록.
+  benchmark: async (panelEl) => {
+    const mod = await import("./tabs/benchmark-tab.js");
+    await mod.mountBenchmarkTab(panelEl);
+  },
+  // generate/mypage 는 후속 Phase 에서 등록.
 };
 
 function activateTab(tabId) {

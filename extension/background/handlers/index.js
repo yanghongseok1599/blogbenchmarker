@@ -10,6 +10,8 @@
 //   - usage.*      사용량     (Phase 3.x 예정)
 
 import { authHandler } from './auth-handler.js'
+import { benchmarkHandler } from './benchmark-handler.js'
+import { ensureBenchmarkAlarm } from '../schedulers/benchmark-sync.js'
 
 /**
  * 액션명 → 비동기 핸들러 함수.
@@ -20,12 +22,16 @@ import { authHandler } from './auth-handler.js'
  * @type {Readonly<Record<string, (payload: any, sender: chrome.runtime.MessageSender) => Promise<any>>>}
  */
 export const routes = Object.freeze({
-  'auth.login':         (payload) => authHandler.login(payload),
-  'auth.signup':        (payload) => authHandler.signup(payload),
-  'auth.logout':        ()        => authHandler.logout(),
-  'auth.resetPassword': (payload) => authHandler.resetPassword(payload),
-  'auth.getSession':    ()        => authHandler.getSession(),
-  'auth.onAuthChange':  ()        => authHandler.onAuthChange(),
+  'auth.login':              (payload) => authHandler.login(payload),
+  'auth.signup':             (payload) => authHandler.signup(payload),
+  'auth.logout':             ()        => authHandler.logout(),
+  'auth.resetPassword':      (payload) => authHandler.resetPassword(payload),
+  'auth.getSession':         ()        => authHandler.getSession(),
+  'auth.onAuthChange':       ()        => authHandler.onAuthChange(),
+  'benchmark.addBlog':       (payload) => benchmarkHandler.addBlog(payload),
+  'benchmark.removeBlog':    (payload) => benchmarkHandler.removeBlog(payload),
+  'benchmark.listBlogs':     (payload) => benchmarkHandler.listBlogs(payload),
+  'benchmark.syncBlogPosts': (payload) => benchmarkHandler.syncBlogPosts(payload),
 })
 
 /**
@@ -38,5 +44,9 @@ export const bootTasks = Object.freeze([
   async () => {
     // 인증 상태 변화 브로드캐스트 구독 — 모든 확장 페이지가 개별 호출하지 않아도 되도록 선 구독.
     await authHandler.onAuthChange()
+  },
+  async () => {
+    // 벤치마킹 주기 동기화 알람 등록 (idempotent — 이미 있으면 no-op).
+    await ensureBenchmarkAlarm()
   },
 ])

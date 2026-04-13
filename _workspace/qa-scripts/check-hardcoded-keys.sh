@@ -52,9 +52,11 @@ RAW_MATCHES="$(grep -rEn "${EXCLUDES[@]}" "${PATTERN}" "${TARGETS[@]}" 2>/dev/nu
 
 # 후처리 필터:
 #   (a) .sql 파일의 SQL 주석 라인(-- ...) 제거: "<path>.sql:<n>:    -- 주석"
-#   (b) Supabase Publishable Key(sb_publishable_*) 매치 제거 (공개 OK)
+#   (b) .ts/.js/.mts/.cts/.jsx/.tsx 파일의 JS/TS 라인 주석(// ...) 제거
+#   (c) Supabase Publishable Key(sb_publishable_*) 매치 제거 (공개 OK)
 FILTERED="$(echo "${RAW_MATCHES}" \
   | grep -vE '\.sql:[0-9]+:[[:space:]]*--' \
+  | grep -vE '\.(t|j|mt|ct)sx?:[0-9]+:[[:space:]]*//' \
   | grep -vE 'sb_publishable_[A-Za-z0-9_-]+' \
   || true)"
 
