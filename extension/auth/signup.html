@@ -4,92 +4,80 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>회원가입 — BLOG BenchMarker</title>
-  <!-- TODO(CSP): MV3 extension_pages CSP(script-src 'self')로 Play CDN이 차단됩니다. 배포 전 로컬 컴파일된 Tailwind 번들로 교체 필요. -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: -apple-system, "Noto Sans KR", sans-serif; background: #f8fafc; color: #0f172a; margin: 0; }
-    .fallback-card { max-width: 420px; margin: 48px auto; padding: 32px; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-    .fallback-input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-    .fallback-btn { width: 100%; padding: 12px; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
-  </style>
+  <link rel="stylesheet" href="auth.css" />
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-6">
-  <main class="fallback-card bg-white w-full max-w-md rounded-xl shadow-md p-8">
-    <header class="mb-6 text-center">
-      <h1 class="text-2xl font-bold text-slate-900">회원가입</h1>
-      <p class="text-sm text-slate-500 mt-1">이메일로 빠르게 시작하세요</p>
+<body class="auth-body">
+  <main class="auth-card">
+    <header class="auth-header">
+      <h1 class="auth-title">회원가입</h1>
+      <p class="auth-subtitle">이메일로 빠르게 시작하세요</p>
     </header>
 
-    <form id="signup-form" class="space-y-4" novalidate>
-      <div>
-        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">이메일</label>
+    <form id="signup-form" class="auth-form" novalidate>
+      <div class="auth-field">
+        <label class="auth-label" for="email">이메일</label>
         <input
+          class="auth-input"
           type="email"
           id="email"
           name="email"
-          class="fallback-input w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="you@example.com"
           autocomplete="email"
           required
         />
       </div>
 
-      <div>
-        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">비밀번호</label>
+      <div class="auth-field">
+        <label class="auth-label" for="password">비밀번호</label>
         <input
+          class="auth-input"
           type="password"
           id="password"
           name="password"
-          class="fallback-input w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="8자 이상, 영문+숫자 조합"
           autocomplete="new-password"
           minlength="8"
+          maxlength="72"
           required
         />
       </div>
 
-      <div>
-        <label for="password-confirm" class="block text-sm font-medium text-slate-700 mb-1">비밀번호 확인</label>
+      <div class="auth-field">
+        <label class="auth-label" for="password-confirm">비밀번호 확인</label>
         <input
+          class="auth-input"
           type="password"
           id="password-confirm"
           name="password-confirm"
-          class="fallback-input w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="비밀번호 재입력"
           autocomplete="new-password"
           minlength="8"
+          maxlength="72"
           required
         />
       </div>
 
-      <label class="flex items-start gap-2 text-sm text-slate-600">
-        <input type="checkbox" id="terms" required class="mt-1" />
+      <label class="auth-terms">
+        <input type="checkbox" id="terms" required />
         <span>
-          <a href="#" class="text-blue-600 hover:underline">이용약관</a> 및
-          <a href="#" class="text-blue-600 hover:underline">개인정보 처리방침</a>에 동의합니다.
+          <a href="#" class="auth-link">이용약관</a> 및
+          <a href="#" class="auth-link">개인정보 처리방침</a>에 동의합니다.
         </span>
       </label>
 
-      <div id="message" class="text-sm hidden" role="alert" aria-live="polite"></div>
+      <div id="message" class="auth-message" role="alert" aria-live="polite" hidden></div>
 
-      <button
-        type="submit"
-        id="submit-btn"
-        class="fallback-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-md transition"
-        style="background:#2563eb;color:#fff;"
-      >
-        가입하기
-      </button>
+      <button type="submit" id="submit-btn" class="auth-btn auth-btn--primary">가입하기</button>
     </form>
 
-    <section id="verify-notice" class="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-md text-sm text-blue-800 hidden" aria-live="polite">
-      <p class="font-semibold mb-1">이메일을 확인해 주세요</p>
-      <p>입력하신 주소로 인증 메일을 보냈습니다. 메일의 링크를 클릭하면 가입이 완료됩니다.</p>
+    <section id="verify-notice" class="auth-notice auth-notice--info" aria-live="polite" hidden>
+      <p class="auth-notice-title">이메일을 확인해 주세요</p>
+      <p class="auth-notice-body">입력하신 주소로 인증 메일을 보냈습니다. 메일의 링크를 클릭하면 가입이 완료됩니다.</p>
     </section>
 
-    <p class="mt-6 text-center text-sm text-slate-600">
+    <p class="auth-links">
       이미 계정이 있으신가요?
-      <a href="login.html" class="text-blue-600 hover:underline">로그인</a>
+      <a href="login.html" class="auth-link">로그인</a>
     </p>
   </main>
 

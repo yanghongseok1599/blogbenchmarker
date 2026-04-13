@@ -1,6 +1,8 @@
 // extension/auth/reset.js
-// 비밀번호 재설정 컨트롤러 — 이메일 확인 + resetPasswordForEmail 호출 골격
-// TODO: import { supabase } from '../lib/supabase-client.js'  (Phase 1.3)
+// 비밀번호 재설정 컨트롤러 — 이메일 확인 + resetPasswordForEmail 실제 호출.
+
+import { supabase } from '../lib/supabase-client.js'
+import { mapResetError } from './auth-error-map.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -11,15 +13,16 @@ function $(id) {
 function showMessage(type, text) {
   const box = $('message')
   if (!box) return
-  box.classList.remove('hidden')
-  box.style.color = type === 'error' ? '#dc2626' : type === 'success' ? '#16a34a' : '#475569'
+  box.classList.remove('is-error', 'is-success', 'is-info')
+  box.classList.add(type === 'error' ? 'is-error' : type === 'success' ? 'is-success' : 'is-info')
   box.textContent = text
+  box.removeAttribute('hidden')
 }
 
 function clearMessage() {
   const box = $('message')
   if (!box) return
-  box.classList.add('hidden')
+  box.setAttribute('hidden', '')
   box.textContent = ''
 }
 
@@ -33,7 +36,7 @@ function setLoading(isLoading) {
 function showSentNotice() {
   const box = $('sent-notice')
   const form = $('reset-form')
-  if (box) box.classList.remove('hidden')
+  if (box) box.removeAttribute('hidden')
   if (form) {
     Array.from(form.elements).forEach((el) => {
       el.disabled = true
@@ -41,6 +44,7 @@ function showSentNotice() {
   }
 }
 
+// 클라이언트 검증은 UX 힌트. 실제 강제는 Supabase Auth 서버 측에서 이뤄진다.
 function validate(email) {
   if (!email || !EMAIL_RE.test(email)) {
     return '올바른 이메일 주소를 입력해 주세요.'
@@ -48,22 +52,11 @@ function validate(email) {
   return null
 }
 
-function mapAuthError(err) {
-  const msg = (err && err.message) ? err.message.toLowerCase() : ''
-  if (msg.includes('rate limit') || msg.includes('too many')) {
-    return '시도 횟수가 너무 많습니다. 잠시 후 다시 시도해 주세요.'
-  }
-  if (msg.includes('network')) {
-    return '네트워크 연결을 확인해 주세요.'
-  }
-  return '메일 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-}
-
 async function handleReset(event) {
   event.preventDefault()
   clearMessage()
 
-  const email = $('email').value.trim()
+  const email = $('email').value.trim().toLowerCase()
 
   const validationError = validate(email)
   if (validationError) {
@@ -73,19 +66,18 @@ async function handleReset(event) {
 
   setLoading(true)
   try {
-    // TODO: Phase 1.3 에서 연결
-    // 참고: 재설정 페이지는 Chrome Extension 외부로의 콜백이 필요하므로
-    // Supabase Site URL에 등록된 외부 랜딩으로 리다이렉트하거나
-    // chrome-extension:// URL을 allowlist에 추가해야 함.
-    // const redirectTo = 'https://YOUR_DOMAIN/reset-confirm'
-    // const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
-    // if (error) throw error
-    // showSentNotice()
+    // 재설정 페이지는 Chrome Extension 외부 랜딩이 필요하다.
+    // Supabase 대시보드의 Site URL에 등록된 URL로 리다이렉트한다.
+    // 확장 내 페이지를 사용하려면 Redirect URLs에 chrome-extension://<ID>/auth/reset-confirm.html 추가 필요.
+    const redirectTo = chrome.runtime.getURL('auth/login.html')
 
-    throw new Error('Supabase client not wired yet (Phase 1.3 pending).')
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+    if (error) throw error
+
+    showSentNotice()
   } catch (err) {
-    showMessage('error', mapAuthError(err))
-    console.warn('[auth/reset] resetPasswordForEmail failed:', err)
+    showMessage('error', mapResetError(err))
+    console.warn('[auth/reset] resetPasswordForEmail failed')
   } finally {
     setLoading(false)
   }
