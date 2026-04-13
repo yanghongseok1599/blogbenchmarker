@@ -1,0 +1,18 @@
+{
+  "name": "blog-benchmarker",
+  "version": "1.0.0",
+  "description": "네이버 블로그 SEO 분석 + AI 글 생성 + 벤치마킹 크롬 확장프로그램",
+  "private": true,
+  "author": "BLOG BenchMarker Team",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "package": "bash scripts/package-extension.sh",
+    "verify": "bash scripts/verify-build.sh",
+    "strip-console": "node scripts/strip-console.js",
+    "all": "bash scripts/build.sh && bash scripts/verify-build.sh"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
