@@ -10,12 +10,14 @@
     "scripting",
     "alarms",
     "notifications",
-    "tabs"
+    "tabs",
+    "identity"
   ],
   "host_permissions": [
     "https://blog.naver.com/*",
     "https://*.blog.naver.com/*",
-    "https://m.blog.naver.com/*"
+    "https://m.blog.naver.com/*",
+    "https://ykyrdwllilffczgryvfv.supabase.co/*"
   ],
   "background": {
     "service_worker": "background/service-worker.js",
@@ -27,6 +29,22 @@
   "action": {
     "default_title": "BLOG BenchMarker 열기"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://blog.naver.com/*",
+        "https://*.blog.naver.com/*",
+        "https://m.blog.naver.com/*"
+      ],
+      "js": [
+        "content/sidebar-injector.js"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -54,6 +72,22 @@
       ],
       "matches": [
         "https://blog.naver.com/*"
+      ]
+    },
+    {
+      "resources": [
+        "content/sidebar.html",
+        "content/sidebar.js",
+        "content/analyzer-bridge.js",
+        "content/screenshot-overlay.js",
+        "lib/dom-safe.js",
+        "lib/supabase-client.js",
+        "lib/env-config.js"
+      ],
+      "matches": [
+        "https://blog.naver.com/*",
+        "https://*.blog.naver.com/*",
+        "https://m.blog.naver.com/*"
       ]
     }
   ]
