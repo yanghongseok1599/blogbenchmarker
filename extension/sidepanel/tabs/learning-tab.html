@@ -1,0 +1,37 @@
+<!--
+  learning-tab.html — Phase 7 학습 탭 마크업 참조본
+  ────────────────────────────────────────────────────────────
+  panel.html 에 직접 include 되지 않는다 (안전 규칙상 raw HTML 삽입 경로 금지).
+  실제 DOM 은 sidepanel/tabs/learning-tab.js 의 buildLearningTabDOM() 이
+  dom-safe(createEl)로 동등 구조를 생성한다. 본 파일은 인간 리뷰·테스트 스냅샷 기준.
+
+  체크박스: generate 탭이 선택된 학습본 ID 를 chrome.storage.local 에서 읽는다
+  (key = bm.learning.selectedIds).
+-->
+<section class="bm-learning" data-tab-content="learning">
+
+  <header class="bm-learning__head">
+    <div class="bm-learning__head-row">
+      <h2 class="bm-learning__title">내 학습 데이터</h2>
+      <span class="bm-learning__count" data-role="count" aria-live="polite"></span>
+    </div>
+    <p class="bm-learning__hint">
+      체크박스로 선택한 글이 AI 글 생성 시 “내 스타일” 참고로 사용됩니다.
+    </p>
+    <div class="bm-learning__head-actions">
+      <button type="button" class="bm-btn" data-action="learning-refresh">새로고침</button>
+      <button type="button" class="bm-btn" data-action="learning-clear-selection">선택 해제</button>
+    </div>
+  </header>
+
+  <div class="bm-learning__status" data-role="status" hidden></div>
+
+  <div class="bm-learning__list" data-role="list">
+    <!-- learning-card 컴포넌트가 N개 append 되는 컨테이너 -->
+  </div>
+
+  <p class="bm-learning__empty" data-role="empty" hidden>
+    아직 학습 데이터가 없습니다. 본인 글 분석 시 “학습에 추가”를 선택해 보세요.
+  </p>
+
+</section>

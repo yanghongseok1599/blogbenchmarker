@@ -13,7 +13,11 @@ const tabActivators = {
     const mod = await import("./tabs/benchmark-tab.js");
     await mod.mountBenchmarkTab(panelEl);
   },
-  // generate/mypage 는 후속 Phase 에서 등록.
+  generate: async (panelEl) => {
+    const mod = await import("./tabs/generate-tab.js");
+    mod.mountGenerateTab(panelEl);
+  },
+  // mypage 는 후속 Phase 에서 등록.
 };
 
 function activateTab(tabId) {

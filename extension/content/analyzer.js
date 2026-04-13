@@ -12,8 +12,16 @@ import { analyze as analyzeSeo } from '../lib/analyzers/seo-analyzer.js'
 
 /**
  * 현재 페이지를 분석한다.
- * @param {Document} [doc] - 테스트·재사용 위해 주입 가능
- * @param {Object}   [options] - { keyword: string }
+ *
+ * Phase 7: options.saveToLearning + options.ownContent 가 둘 다 true 일 때
+ * 분석 성공 직후 'learning.save' 메시지를 background 로 dispatch 한다.
+ * **저작권 안전:** ownContent 플래그가 true 가 아니면 저장 경로는 절대 발화하지 않는다.
+ *
+ * @param {Document} [doc] 테스트·재사용을 위해 주입 가능
+ * @param {Object}   [options]
+ * @param {string}   [options.keyword]            기존 SEO 키워드 옵션
+ * @param {boolean}  [options.saveToLearning]     true 면 learning_data 에 INSERT 시도
+ * @param {boolean}  [options.ownContent]         true 일 때만 저장 허용 (저작권 게이트)
  * @returns {{ok: true, data: AnalysisResult} | {ok: false, error: string, code: string, data?: any}}
  */
 export function runAnalysis(
@@ -54,6 +62,22 @@ export function runAnalysis(
     }
   }
 
+  // saveToLearning + ownContent 양쪽이 true 일 때만 학습 저장 dispatch
+  const saveToLearning = options?.saveToLearning === true
+  const ownContent = options?.ownContent === true
+  const saved = saveToLearning && ownContent
+    ? dispatchLearningSave({
+        title: payload.title,
+        content: payload.content,
+        keywords: extractKeywordList(result),
+        meta: {
+          sourceUrl: payload.meta?.url ?? null,
+          totalScore: result?.totalScore ?? null,
+          editorVersion,
+        },
+      })
+    : null
+
   return {
     ok: true,
     data: {
@@ -64,9 +88,53 @@ export function runAnalysis(
         title:         payload.title,
         imageCount:    payload.images.length,
         elapsedMs:     Date.now() - startedAt
-      }
+      },
+      saveToLearning: saved !== null,
+      learningSaved: null   // 백그라운드 응답을 기다리지 않으므로 항상 null. 후속 메시지로 갱신.
     }
   }
+}
+
+/**
+ * background/handlers/learning-handler.js 의 'learning.save' 를 호출한다.
+ * fire-and-forget — content script 는 응답을 기다리지 않는다.
+ * 메시지는 ownContent: true 를 명시 — handler 측 게이트와 일치시킨다.
+ * @param {{ title: string, content: string, keywords?: string[], meta?: Object }} payload
+ * @returns {true | null} dispatch 시도 여부
+ */
+function dispatchLearningSave(payload) {
+  if (typeof chrome === 'undefined' || !chrome.runtime?.sendMessage) {
+    return null
+  }
+  try {
+    chrome.runtime.sendMessage(
+      { action: 'learning.save', payload: { ownContent: true, ...payload } },
+      () => {
+        // 응답은 무시 — 단 lastError 는 읽어 unhandled error 로그 회피.
+        void chrome.runtime.lastError
+      },
+    )
+    return true
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 분석 결과의 상위 키워드를 평탄한 문자열 배열로 변환한다.
+ * @param {Object} result seo-analyzer 결과
+ * @returns {string[]}
+ */
+function extractKeywordList(result) {
+  // seo-analyzer 의 keywordDensity 섹션이 가장 일반적인 키워드 소스.
+  const fromStats = result?.stats?.topKeywords
+  if (Array.isArray(fromStats)) {
+    return fromStats
+      .map((k) => (typeof k === 'string' ? k : k?.word))
+      .filter((v) => typeof v === 'string' && v)
+      .slice(0, 20)
+  }
+  return []
 }
 
 // 재export — background handler 가 DOM 추출만 필요한 경우(경쟁 블로그 스크래핑 등)에 사용

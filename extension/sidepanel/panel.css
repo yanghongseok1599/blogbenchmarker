@@ -141,3 +141,90 @@ html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFo
   .bm-compare__grid { grid-template-columns: 1fr; }
   .bm-stats__metrics { grid-template-columns: 1fr; }
 }
+
+/* ─── Phase 8.1 마이페이지 (사이드패널 탭) ─── */
+
+/* usage-gauge */
+.bm-gauge { display: flex; flex-direction: column; gap: 6px; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; }
+.bm-gauge__head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.bm-gauge__label { font-size: 12px; color: #64748b; font-weight: 600; }
+.bm-gauge__count { font-size: 12px; color: #475569; }
+.bm-gauge__count strong { color: #0f172a; font-weight: 700; }
+.bm-gauge__count--unlimited strong { color: #7c3aed; }
+.bm-gauge__body { display: flex; align-items: center; gap: 10px; }
+.bm-gauge__track { flex: 1; height: 8px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.bm-gauge__fill { height: 100%; border-radius: 999px; transition: width 200ms ease, background 200ms ease; }
+.bm-gauge__fill--good { background: #16a34a; }
+.bm-gauge__fill--fair { background: #0ea5e9; }
+.bm-gauge__fill--warn { background: #f59e0b; }
+.bm-gauge__fill--danger { background: #dc2626; }
+.bm-gauge__percent { font-size: 11px; font-weight: 700; min-width: 36px; text-align: right; color: #475569; }
+.bm-gauge__percent--warn { color: #b45309; }
+.bm-gauge__percent--danger { color: #b91c1c; }
+.bm-gauge__percent--good { color: #166534; }
+.bm-gauge__note { margin: 0; font-size: 11px; color: #64748b; }
+.bm-gauge__note--warn { color: #b45309; }
+.bm-gauge__note--danger { color: #b91c1c; }
+.bm-gauge__note--unlimited { color: #7c3aed; }
+
+/* expiry-banner */
+.bm-expiry { padding: 10px 12px; border-radius: 8px; border: 1px solid; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.bm-expiry--warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+.bm-expiry--danger { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+.bm-expiry--expired { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+.bm-expiry__title { margin: 0; font-weight: 700; }
+.bm-expiry__body { margin: 0; line-height: 1.4; }
+.bm-expiry__actions { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+.bm-expiry__cta { padding: 4px 10px; border: 0; border-radius: 6px; background: #0f172a; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+.bm-expiry__cta:hover { background: #334155; }
+.bm-expiry__dismiss { padding: 4px 10px; border: 1px solid currentColor; border-radius: 6px; background: transparent; color: inherit; font-size: 11px; cursor: pointer; }
+.bm-expiry__dismiss:hover { opacity: 0.75; }
+
+/* mypage-tab */
+.bm-mypage { display: flex; flex-direction: column; gap: 12px; }
+.bm-mypage__profile { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; }
+.bm-mypage__avatar { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; text-transform: uppercase; }
+.bm-mypage__info { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.bm-mypage__name { margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bm-mypage__email { margin: 0; font-size: 11px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bm-mypage__plan { padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; background: #e2e8f0; color: #475569; }
+.bm-mypage__plan[data-plan="pro"] { background: #2563eb; color: #fff; }
+.bm-mypage__plan[data-plan="unlimited"] { background: #7c3aed; color: #fff; }
+.bm-mypage__plan[data-plan="free"] { background: #e2e8f0; color: #475569; }
+.bm-mypage__gauge-slot { min-height: 20px; }
+.bm-mypage__meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-size: 12px; }
+.bm-mypage__meta-row { display: contents; }
+.bm-mypage__meta-row > dt { color: #64748b; }
+.bm-mypage__meta-row > dd { margin: 0; color: #0f172a; font-weight: 600; text-align: right; }
+.bm-mypage__actions { display: flex; gap: 6px; }
+.bm-mypage__actions .bm-btn { flex: 1; }
+.bm-mypage__error { margin: 0; padding: 8px 10px; background: #fef2f2; color: #b91c1c; border-radius: 6px; font-size: 12px; }
+
+/* ─── Phase 7 학습 탭 ─── */
+.bm-learning { display: flex; flex-direction: column; gap: 12px; }
+.bm-learning__head { display: flex; flex-direction: column; gap: 6px; }
+.bm-learning__head-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.bm-learning__title { margin: 0; font-size: 14px; font-weight: 700; color: #0f172a; }
+.bm-learning__count { font-size: 12px; color: #64748b; font-weight: 600; }
+.bm-learning__hint { margin: 0; font-size: 12px; color: #666; }
+.bm-learning__head-actions { display: flex; gap: 6px; }
+.bm-learning__head-actions .bm-btn { flex: 0 0 auto; padding: 6px 10px; background: #fff; color: #111; border-color: #ddd; }
+.bm-learning__head-actions .bm-btn:hover:not(:disabled) { background: #f5f5f5; }
+.bm-learning__list { display: flex; flex-direction: column; gap: 8px; }
+.bm-learning__status { padding: 8px 10px; border-radius: 6px; font-size: 12px; }
+.bm-learning__status--info { background: #eef4ff; color: #1e3a8a; }
+.bm-learning__status--error { background: #fef2f2; color: #b91c1c; }
+.bm-learning__empty { margin: 0; padding: 24px 12px; text-align: center; color: #94a3b8; font-size: 12px; background: #fff; border: 1px dashed #e5e7eb; border-radius: 8px; }
+
+/* ─── learning-card 컴포넌트 ─── */
+.bm-lcard { padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; }
+.bm-lcard[data-selected="true"] { border-color: #2563eb; background: #eff6ff; }
+.bm-lcard__head { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.bm-lcard__check { flex: 0 0 auto; width: 16px; height: 16px; cursor: pointer; }
+.bm-lcard__title { margin: 0; flex: 1; font-size: 13px; font-weight: 600; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bm-lcard__meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.bm-lcard__date { font-size: 11px; color: #94a3b8; }
+.bm-lcard__delete { padding: 3px 8px; border: 1px solid #fecaca; background: #fff; color: #b91c1c; border-radius: 6px; font-size: 11px; cursor: pointer; }
+.bm-lcard__delete:hover { background: #fef2f2; }
+.bm-lcard__chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+.bm-lcard__chip { padding: 2px 6px; background: #f1f5f9; color: #475569; font-size: 11px; border-radius: 999px; }

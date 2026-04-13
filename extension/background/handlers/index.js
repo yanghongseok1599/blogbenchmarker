@@ -11,6 +11,8 @@
 
 import { authHandler } from './auth-handler.js'
 import { benchmarkHandler } from './benchmark-handler.js'
+import { generateHandler } from './generate-handler.js'
+import { learningHandler } from './learning-handler.js'
 import { ensureBenchmarkAlarm } from '../schedulers/benchmark-sync.js'
 
 /**
@@ -32,6 +34,8 @@ export const routes = Object.freeze({
   'benchmark.removeBlog':    (payload) => benchmarkHandler.removeBlog(payload),
   'benchmark.listBlogs':     (payload) => benchmarkHandler.listBlogs(payload),
   'benchmark.syncBlogPosts': (payload) => benchmarkHandler.syncBlogPosts(payload),
+  'generate.content':        (payload) => generateHandler.content(payload),
+  'learning.save':           (payload) => learningHandler.save(payload),
 })
 
 /**

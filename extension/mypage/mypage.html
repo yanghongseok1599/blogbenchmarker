@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>마이페이지 — BLOG BenchMarker</title>
+  <link rel="stylesheet" href="mypage.css" />
+</head>
+<body class="bbmp-body">
+  <header class="bbmp-topbar">
+    <div class="bbmp-topbar__inner">
+      <h1 class="bbmp-topbar__title">BLOG BenchMarker</h1>
+      <nav class="bbmp-topbar__nav">
+        <a href="#" id="bbmp-back" class="bbmp-topbar__link" role="button" aria-label="사이드패널로 돌아가기">닫기</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="bbmp-main">
+    <section id="bbmp-expiry-slot" aria-label="만료 알림"></section>
+
+    <section class="bbmp-grid">
+      <article class="bbmp-card bbmp-card--profile" aria-label="프로필">
+        <header class="bbmp-card__head">
+          <h2 class="bbmp-card__title">프로필</h2>
+        </header>
+        <div class="bbmp-profile">
+          <div class="bbmp-profile__avatar" aria-hidden="true" id="bbmp-avatar">?</div>
+          <div class="bbmp-profile__info">
+            <p class="bbmp-profile__name" id="bbmp-name">—</p>
+            <p class="bbmp-profile__email" id="bbmp-email">—</p>
+            <p class="bbmp-profile__joined" id="bbmp-joined"></p>
+          </div>
+        </div>
+      </article>
+
+      <article class="bbmp-card bbmp-card--plan" aria-label="현재 플랜">
+        <header class="bbmp-card__head">
+          <h2 class="bbmp-card__title">현재 플랜</h2>
+          <span id="bbmp-plan-badge" class="bbmp-plan-badge">—</span>
+        </header>
+        <dl class="bbmp-plan-details">
+          <div class="bbmp-plan-row">
+            <dt>상태</dt>
+            <dd id="bbmp-plan-status">—</dd>
+          </div>
+          <div class="bbmp-plan-row">
+            <dt>만료일</dt>
+            <dd id="bbmp-plan-expiry">—</dd>
+          </div>
+          <div class="bbmp-plan-row">
+            <dt>결제 수단</dt>
+            <dd id="bbmp-plan-gateway">—</dd>
+          </div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="bbmp-card bbmp-card--usage" aria-label="사용량 대시보드">
+      <header class="bbmp-card__head">
+        <h2 class="bbmp-card__title">사용량</h2>
+        <p class="bbmp-card__subtitle">최근 30일 기준</p>
+      </header>
+      <div id="bbmp-gauge-slot" class="bbmp-usage-slot"></div>
+      <div class="bbmp-usage-breakdown">
+        <h3 class="bbmp-subtitle">기능별 사용 내역</h3>
+        <table class="bbmp-table" id="bbmp-breakdown-table">
+          <thead>
+            <tr>
+              <th scope="col">기능</th>
+              <th scope="col" class="bbmp-table__num">사용 횟수</th>
+              <th scope="col" class="bbmp-table__num">토큰</th>
+            </tr>
+          </thead>
+          <tbody id="bbmp-breakdown-body">
+            <tr><td colspan="3" class="bbmp-empty">불러오는 중…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="bbmp-error-slot" aria-live="polite"></section>
+  </main>
+
+  <script type="module" src="mypage.js"></script>
+</body>
+</html>

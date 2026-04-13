@@ -32,5 +32,17 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "mypage/mypage.html",
+        "mypage/mypage.js",
+        "mypage/mypage.css"
+      ],
+      "matches": [
+        "https://blog.naver.com/*"
+      ]
+    }
+  ]
 }

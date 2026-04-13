@@ -1,0 +1,211 @@
+/* extension/mypage/mypage.css
+ * 독립 페이지 전용 스타일. Tailwind 없이 수작업.
+ * 사이드패널의 panel.css 컴포넌트(.bm-gauge*, .bm-expiry*)를 공유하기 위해
+ * 본 파일에도 동일 토큰의 컴포넌트 스타일을 복제한다(페이지는 panel.css 를 로드하지 않음).
+ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+}
+
+.bbmp-topbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.bbmp-topbar__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bbmp-topbar__title { margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; }
+.bbmp-topbar__nav { display: flex; gap: 12px; }
+.bbmp-topbar__link {
+  color: #475569;
+  font-size: 13px;
+  text-decoration: none;
+}
+.bbmp-topbar__link:hover { color: #0f172a; text-decoration: underline; }
+
+.bbmp-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bbmp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 720px) {
+  .bbmp-grid { grid-template-columns: 1fr; }
+}
+
+.bbmp-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bbmp-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.bbmp-card__title { margin: 0; font-size: 14px; font-weight: 700; color: #0f172a; }
+.bbmp-card__subtitle { margin: 0; font-size: 11px; color: #64748b; }
+
+/* profile */
+.bbmp-profile { display: flex; align-items: center; gap: 14px; }
+.bbmp-profile__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.bbmp-profile__info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bbmp-profile__name { margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bbmp-profile__email { margin: 0; font-size: 12px; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bbmp-profile__joined { margin: 2px 0 0; font-size: 11px; color: #94a3b8; }
+
+/* plan */
+.bbmp-plan-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #0f172a;
+}
+.bbmp-plan-badge[data-plan="pro"] { background: #2563eb; color: #ffffff; }
+.bbmp-plan-badge[data-plan="unlimited"] { background: #7c3aed; color: #ffffff; }
+.bbmp-plan-badge[data-plan="free"] { background: #e2e8f0; color: #475569; }
+.bbmp-plan-details { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; }
+.bbmp-plan-row { display: contents; }
+.bbmp-plan-row > dt { font-size: 12px; color: #64748b; }
+.bbmp-plan-row > dd { margin: 0; font-size: 13px; color: #0f172a; font-weight: 600; }
+
+/* usage */
+.bbmp-usage-slot { padding: 8px 0 4px; }
+.bbmp-subtitle { margin: 8px 0 6px; font-size: 12px; font-weight: 600; color: #334155; }
+.bbmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.bbmp-table thead th {
+  text-align: left;
+  padding: 8px 10px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.bbmp-table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.bbmp-table__num { text-align: right; font-variant-numeric: tabular-nums; }
+.bbmp-empty { padding: 16px; text-align: center; color: #94a3b8; font-size: 12px; }
+.bbmp-error {
+  padding: 10px 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* === 공유 컴포넌트 (sidepanel/panel.css 와 동일 규격 복제) === */
+
+/* usage-gauge */
+.bm-gauge { display: flex; flex-direction: column; gap: 8px; }
+.bm-gauge__head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.bm-gauge__label { font-size: 12px; color: #64748b; font-weight: 600; }
+.bm-gauge__count { font-size: 12px; color: #475569; }
+.bm-gauge__count strong { color: #0f172a; font-weight: 700; }
+.bm-gauge__count--unlimited strong { color: #7c3aed; }
+.bm-gauge__body { display: flex; align-items: center; gap: 10px; }
+.bm-gauge__track { flex: 1; height: 10px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.bm-gauge__fill { height: 100%; border-radius: 999px; transition: width 200ms ease, background 200ms ease; }
+.bm-gauge__fill--good { background: #16a34a; }
+.bm-gauge__fill--fair { background: #0ea5e9; }
+.bm-gauge__fill--warn { background: #f59e0b; }
+.bm-gauge__fill--danger { background: #dc2626; }
+.bm-gauge__percent { font-size: 12px; font-weight: 700; min-width: 40px; text-align: right; color: #475569; }
+.bm-gauge__percent--warn { color: #b45309; }
+.bm-gauge__percent--danger { color: #b91c1c; }
+.bm-gauge__percent--good { color: #166534; }
+.bm-gauge__note { margin: 0; font-size: 11px; color: #64748b; }
+.bm-gauge__note--warn { color: #b45309; }
+.bm-gauge__note--danger { color: #b91c1c; }
+.bm-gauge__note--unlimited { color: #7c3aed; }
+
+/* expiry-banner */
+.bm-expiry {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bm-expiry--warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+.bm-expiry--danger { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+.bm-expiry--expired { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+.bm-expiry__title { margin: 0; font-size: 13px; font-weight: 700; }
+.bm-expiry__body { margin: 0; font-size: 12px; line-height: 1.4; }
+.bm-expiry__actions { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.bm-expiry__cta {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.bm-expiry__cta:hover { background: #334155; }
+.bm-expiry__dismiss {
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.bm-expiry__dismiss:hover { opacity: 0.75; }

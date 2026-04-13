@@ -1,0 +1,36 @@
+<!-- extension/sidepanel/tabs/mypage-tab.html
+     사이드패널 '마이' 탭 마크업 조각. panel.html 로드 후 mypage-tab.js 가 이 파일을
+     fetch('mypage-tab.html') 로 읽어 탭 컨테이너에 삽입한다(정적 import 금지).
+     정적 슬롯만 포함 — 동적 값은 mypage-tab.js 에서 safeText 로 갱신. -->
+<div class="bm-mypage">
+  <section id="bm-mypage-expiry" aria-label="만료 알림"></section>
+
+  <section class="bm-mypage__profile" aria-label="내 프로필">
+    <div class="bm-mypage__avatar" aria-hidden="true" id="bm-mypage-avatar">?</div>
+    <div class="bm-mypage__info">
+      <p class="bm-mypage__name" id="bm-mypage-name">—</p>
+      <p class="bm-mypage__email" id="bm-mypage-email">—</p>
+    </div>
+    <span class="bm-mypage__plan" id="bm-mypage-plan" data-plan="free">—</span>
+  </section>
+
+  <section class="bm-mypage__gauge-slot" id="bm-mypage-gauge" aria-label="이번 달 사용량"></section>
+
+  <dl class="bm-mypage__meta">
+    <div class="bm-mypage__meta-row">
+      <dt>만료일</dt>
+      <dd id="bm-mypage-expiry-date">—</dd>
+    </div>
+    <div class="bm-mypage__meta-row">
+      <dt>상태</dt>
+      <dd id="bm-mypage-status">—</dd>
+    </div>
+  </dl>
+
+  <div class="bm-mypage__actions">
+    <button type="button" id="bm-mypage-open" class="bm-btn bm-btn--primary">전체 보기</button>
+    <button type="button" id="bm-mypage-refresh" class="bm-btn">새로 고침</button>
+  </div>
+
+  <p id="bm-mypage-error" class="bm-mypage__error" role="alert" hidden></p>
+</div>
