@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "BLOG BenchMarker",
+  "version": "0.1.0",
+  "description": "네이버 블로그 SEO 분석 + AI 글 생성 + 경쟁 블로그 벤치마킹 (Supabase 백엔드)",
+  "default_locale": "ko",
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*.naver.com/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/panel.html"
+  },
+  "action": {
+    "default_title": "BLOG BenchMarker 열기"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

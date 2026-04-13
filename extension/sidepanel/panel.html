@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLOG BenchMarker</title>
+  <link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+  <header class="bm-header">
+    <h1 class="bm-title">BLOG BenchMarker</h1>
+  </header>
+
+  <nav class="bm-tabs" role="tablist" aria-label="기능 탭">
+    <button class="bm-tab is-active" role="tab" data-tab="analyze" aria-selected="true">분석</button>
+    <button class="bm-tab" role="tab" data-tab="benchmark" aria-selected="false">벤치마크</button>
+    <button class="bm-tab" role="tab" data-tab="generate" aria-selected="false">생성</button>
+    <button class="bm-tab" role="tab" data-tab="mypage" aria-selected="false">마이</button>
+  </nav>
+
+  <main class="bm-panels">
+    <section class="bm-panel is-active" role="tabpanel" data-panel="analyze" aria-label="분석">
+      <!-- Phase 2.x 에서 analyze-tab.js 가 렌더 -->
+      <p class="bm-placeholder">분석 탭 (골격)</p>
+    </section>
+
+    <section class="bm-panel" role="tabpanel" data-panel="benchmark" aria-label="벤치마크" hidden>
+      <!-- Phase 4.x 에서 benchmark-tab.js 가 렌더 -->
+      <p class="bm-placeholder">벤치마크 탭 (골격)</p>
+    </section>
+
+    <section class="bm-panel" role="tabpanel" data-panel="generate" aria-label="생성" hidden>
+      <!-- Phase 3.x 에서 generate-tab.js 가 렌더 -->
+      <p class="bm-placeholder">생성 탭 (골격)</p>
+    </section>
+
+    <section class="bm-panel" role="tabpanel" data-panel="mypage" aria-label="마이" hidden>
+      <!-- Phase 5.x 에서 settings/mypage 탭이 렌더 -->
+      <p class="bm-placeholder">마이 탭 (골격)</p>
+    </section>
+  </main>
+
+  <script type="module" src="panel.js"></script>
+</body>
+</html>
