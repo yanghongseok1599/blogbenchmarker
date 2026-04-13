@@ -8,7 +8,9 @@
     "storage",
     "sidePanel",
     "scripting",
-    "alarms"
+    "alarms",
+    "notifications",
+    "tabs"
   ],
   "host_permissions": [
     "https://blog.naver.com/*",
@@ -39,6 +41,16 @@
         "mypage/mypage.html",
         "mypage/mypage.js",
         "mypage/mypage.css"
+      ],
+      "matches": [
+        "https://blog.naver.com/*"
+      ]
+    },
+    {
+      "resources": [
+        "admin/admin.html",
+        "admin/admin.js",
+        "admin/admin.css"
       ],
       "matches": [
         "https://blog.naver.com/*"

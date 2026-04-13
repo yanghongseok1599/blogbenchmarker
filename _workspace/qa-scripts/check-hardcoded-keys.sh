@@ -57,6 +57,7 @@ RAW_MATCHES="$(grep -rEn "${EXCLUDES[@]}" "${PATTERN}" "${TARGETS[@]}" 2>/dev/nu
 FILTERED="$(echo "${RAW_MATCHES}" \
   | grep -vE '\.sql:[0-9]+:[[:space:]]*--' \
   | grep -vE '\.(t|j|mt|ct)sx?:[0-9]+:[[:space:]]*//' \
+  | grep -vE '\.(t|j|mt|ct)sx?:[0-9]+:[[:space:]]*\*' \
   | grep -vE 'sb_publishable_[A-Za-z0-9_-]+' \
   || true)"
 

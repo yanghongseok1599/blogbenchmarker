@@ -115,6 +115,30 @@ key-value 전역 설정.
 
 ---
 
+### 1.7a `public.admin_audit_log` — 008_admin_audit.sql
+관리자 액션 감사 로그. **사후 변경 금지**(UPDATE/DELETE 정책 없음).
+
+| 컬럼 | 타입 | 제약 |
+|------|------|------|
+| `id` | BIGSERIAL | PK |
+| `admin_id` | UUID | FK `profiles(id)` ON DELETE **SET NULL** (관리자 삭제 후에도 감사 보존) |
+| `action` | TEXT | NOT NULL — `{domain}.{verb}` 형식 (예: `user.setPlan`, `settings.set`) |
+| `target_user_id` | UUID | FK `profiles(id)` ON DELETE **SET NULL**. NULL 허용(시스템 작업) |
+| `metadata` | JSONB | NOT NULL DEFAULT `{}` — 변경 전/후 값, params, error 등 |
+| `created_at` | TIMESTAMPTZ | NOT NULL DEFAULT `NOW()` |
+
+**인덱스:**
+- `idx_admin_audit_log_admin_created` `(admin_id, created_at DESC)`
+- `idx_admin_audit_log_target_created` `(target_user_id, created_at DESC) WHERE target_user_id IS NOT NULL`
+- `idx_admin_audit_log_action_created` `(action, created_at DESC)` — 액션 타입별 집계
+- `idx_admin_audit_log_metadata` GIN on `metadata`
+
+**RLS:**
+- `admin_audit_log admin select` — `is_admin_user()` 만 SELECT
+- INSERT/UPDATE/DELETE 정책 **없음** → service_role(`admin-actions` Edge Function) 만 쓰기 가능
+
+---
+
 ### 1.7 `public.subscriptions` — 005_settings.sql
 결제 성공 이력 (Edge Function `verify-subscription` 이 쓰기).
 
@@ -154,6 +178,8 @@ key-value 전역 설정.
 | benchmark_posts.blog_id | benchmark_blogs.id | CASCADE |
 | usage_logs.user_id | profiles.id | CASCADE |
 | subscriptions.user_id | profiles.id | CASCADE |
+| admin_audit_log.admin_id | profiles.id | **SET NULL** (감사 보존) |
+| admin_audit_log.target_user_id | profiles.id | **SET NULL** (감사 보존) |
 
 > 결과: `auth.users` 1건 삭제 → 해당 유저의 모든 파생 데이터가 자동 정리 (GDPR 대응).
 
@@ -172,6 +198,7 @@ key-value 전역 설정.
 | usage_logs | 본인 | 본인 | — (불변) | — (불변) | 전권 (FOR ALL) |
 | app_settings | **공개 (true)** | 관리자 | 관리자 | 관리자 | — |
 | subscriptions | 본인 | — (service_role) | — (service_role) | — (service_role) | 전권 (FOR ALL) |
+| admin_audit_log | 관리자 | — (service_role) | — (불변) | — (불변) | SELECT 만 |
 
 **주의사항:**
 - `profiles` INSERT 정책은 **없다**. 생성은 오직 `handle_new_user()` 트리거(SECURITY DEFINER)로만.
@@ -205,6 +232,8 @@ key-value 전역 설정.
 |------|-------------|------|
 | 2026-04-13 | 001 ~ 006 | Phase 1.2 초기 스키마 + RLS 일괄 생성 |
 | 2026-04-14 | 001, 005, 006 | QA 리포트 1.2 의 BLOCKER 2 + HIGH 5 해소 (아래 §6 diff 참조) |
+| 2026-04-14 | 007 | Phase 8.2 — subscriptions ↔ profiles.plan 자동 동기화 트리거 (아래 §7 참조) |
+| 2026-04-14 | 008 | Phase 11 — `admin_audit_log` 신설 (admin-actions Edge Function 의 감사 추적) |
 
 ---
 
@@ -246,3 +275,45 @@ key-value 전역 설정.
   - `subscription-repo` — `status` 필드 기반 활성 구독 판정으로 변경(`where status='active' and (ends_at is null or ends_at > now())`).
   - `gateway_ref` 를 참조하는 코드가 있다면 `payment_id` 로 이름 치환.
 - **RLS 정책 내용 불변:** is_admin_user() 는 기존 EXISTS 와 동치. 권한 경계 변경 없음.
+
+---
+
+## 7. 007_payment_triggers.sql — Phase 8.2 (2026-04-14)
+
+### 7.1 도입 배경
+`subscriptions` 테이블이 결제 이력을 쌓지만, `profiles.plan` 은 **현재 유효한 최고 등급** 을 빠르게 읽기 위한 denormalized 필드다. 두 값의 drift 를 막기 위해 DB 레벨 트리거로 자동 동기화한다.
+
+### 7.2 추가된 DB 객체
+| 이름 | 종류 | 역할 |
+|---|---|---|
+| `public.plan_rank(plan TEXT)` | IMMUTABLE function | free(0) < pro(1) < unlimited(2) 우선순위 |
+| `public.compute_effective_plan(user_id UUID)` | STABLE function | 본인의 `status='active'` + 유효 ends_at 중 최고 rank → plan |
+| `public.refresh_user_plan(user_id UUID)` | SECURITY DEFINER function | profiles.plan 을 effective plan 으로 UPDATE |
+| `public.subscriptions_sync_plan()` | trigger function | INSERT/UPDATE/DELETE 시 refresh_user_plan 호출 (UPDATE 에서 user_id 변경 시 OLD 도 함께 갱신) |
+| `trg_subscriptions_sync_plan` | trigger | AFTER INSERT OR UPDATE OR DELETE ON subscriptions FOR EACH ROW |
+| `public.expire_due_subscriptions()` | SECURITY DEFINER function | `status='active' AND ends_at<NOW()` 행을 'expired' 로 전환 → 트리거 연쇄 발화 |
+
+### 7.3 만료 시 동작 순서
+```
+pg_cron (또는 수동/Edge Function) → SELECT expire_due_subscriptions()
+    ↓ UPDATE subscriptions SET status='expired' WHERE ends_at < NOW() AND status='active'
+    ↓ trg_subscriptions_sync_plan AFTER UPDATE 발화 (행마다)
+    ↓ refresh_user_plan(user_id) 호출
+    ↓ compute_effective_plan → 활성 구독 없으면 'free' 반환
+    ↓ profiles.plan = 'free' 업데이트
+```
+
+### 7.4 운영자 가이드
+- **권장 스케줄:** Supabase Dashboard → Database → Extensions 에서 `pg_cron` 활성화 후
+  ```sql
+  SELECT cron.schedule('expire-subscriptions',
+    '*/15 * * * *',
+    $$SELECT public.expire_due_subscriptions()$$);
+  ```
+- **대안:** pg_cron 미사용 시 Edge Function(별도 cron-trigger) 또는 외부 스케줄러가 15분~1시간 주기로 `expire_due_subscriptions()` 호출.
+- **배포 정합화:** 본 마이그레이션 끝단의 DO 블록이 모든 profiles 에 대해 `refresh_user_plan()` 을 1회 호출 — 기존 데이터 드리프트를 일괄 교정.
+
+### 7.5 Repository / Edge Function 영향
+- `user-repo` — `plan` 값을 쓰는 코드는 **읽기 전용** 으로 가정(쓰기는 오직 트리거). updateProfile 의 `UPDATABLE_FIELDS` 에 plan 을 추가하지 말 것.
+- `verify-subscription` (Edge Function) — subscriptions 를 UPSERT/UPDATE 하기만 하면 되며 profiles 는 직접 만지지 않음.
+- `boundary-qa §4-4`: "결제 성공 시 profiles.plan 업데이트 트랜잭션 원자성" 은 트리거로 이행됨 (subscriptions UPDATE 와 profiles UPDATE 가 동일 트랜잭션).

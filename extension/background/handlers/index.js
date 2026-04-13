@@ -13,6 +13,7 @@ import { authHandler } from './auth-handler.js'
 import { benchmarkHandler } from './benchmark-handler.js'
 import { generateHandler } from './generate-handler.js'
 import { learningHandler } from './learning-handler.js'
+import { pomodoroHandler } from './pomodoro-handler.js'
 import { ensureBenchmarkAlarm } from '../schedulers/benchmark-sync.js'
 
 /**
@@ -36,6 +37,11 @@ export const routes = Object.freeze({
   'benchmark.syncBlogPosts': (payload) => benchmarkHandler.syncBlogPosts(payload),
   'generate.content':        (payload) => generateHandler.content(payload),
   'learning.save':           (payload) => learningHandler.save(payload),
+  'tools.pomodoro.getState': ()        => pomodoroHandler.getState(),
+  'tools.pomodoro.start':    (payload) => pomodoroHandler.start(payload),
+  'tools.pomodoro.pause':    ()        => pomodoroHandler.pause(),
+  'tools.pomodoro.resume':   ()        => pomodoroHandler.resume(),
+  'tools.pomodoro.reset':    ()        => pomodoroHandler.reset(),
 })
 
 /**

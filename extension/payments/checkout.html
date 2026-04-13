@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BLOG BenchMarker — 결제</title>
+  <!--
+    CSP 주의:
+    본 페이지는 확장 내부(chrome-extension://) 에서 로드되므로 외부 PG 위젯 스크립트를 직접 포함하지 않는다.
+    실제 결제창은 외부 호스팅된 결제 랜딩(예: https://billing.example.com/checkout) 을 새 탭으로 열어 처리한다.
+    (근거: MV3 기본 extension_pages CSP = "script-src 'self'". 외부 JS 로드 시 심사 리스크.)
+  -->
+  <!-- checkout.css 는 Phase 8.3(UI 빌더) 에서 추가 예정 -->
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 24px; color: #222; }
+    .bm-checkout { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+    .bm-checkout__head h1 { margin: 0 0 4px; font-size: 20px; }
+    .bm-checkout__desc { margin: 0; color: #666; font-size: 13px; }
+    .bm-checkout__plans { display: flex; flex-direction: column; gap: 8px; }
+    .bm-checkout__plan { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid #eee; border-radius: 8px; cursor: pointer; }
+    .bm-checkout__plan-name { margin: 0 0 2px; font-size: 14px; }
+    .bm-checkout__plan-price { margin: 0; font-weight: 600; }
+    .bm-checkout__plan-desc { margin: 4px 0 0; color: #666; font-size: 12px; }
+    .bm-checkout__gateway h2 { font-size: 14px; margin: 0 0 6px; }
+    .bm-checkout__gateway-options { display: flex; gap: 12px; }
+    .bm-btn { padding: 10px 14px; border-radius: 6px; border: 0; font-size: 14px; cursor: pointer; }
+    .bm-btn--primary { background: #111; color: #fff; }
+    .bm-checkout__status { padding: 8px; border-radius: 6px; font-size: 12px; }
+    .bm-checkout__status--info { background: #eef4ff; color: #1e3a8a; }
+    .bm-checkout__status--error { background: #fef2f2; color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <main class="bm-checkout">
+    <header class="bm-checkout__head">
+      <h1>플랜 업그레이드</h1>
+      <p class="bm-checkout__desc">
+        원하는 플랜을 선택하면 안전한 외부 결제 페이지로 이동합니다.
+      </p>
+    </header>
+
+    <section class="bm-checkout__plans" data-role="plans">
+      <!-- plan 카드가 JS 로 렌더됨. textContent 경로만 사용. -->
+    </section>
+
+    <section class="bm-checkout__gateway">
+      <h2>결제 수단</h2>
+      <div class="bm-checkout__gateway-options">
+        <label>
+          <input type="radio" name="gateway" value="toss" checked />
+          <span>토스페이먼츠</span>
+        </label>
+        <label>
+          <input type="radio" name="gateway" value="portone" />
+          <span>포트원</span>
+        </label>
+      </div>
+    </section>
+
+    <button type="button" class="bm-btn bm-btn--primary" data-action="proceed-checkout">
+      결제 페이지로 이동
+    </button>
+
+    <p class="bm-checkout__status" data-role="status" hidden role="status" aria-live="polite"></p>
+  </main>
+
+  <script type="module" src="checkout.js"></script>
+</body>
+</html>

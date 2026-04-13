@@ -1,57 +1,76 @@
 // extension/auth/auth-error-map.js
-// Supabase Auth 에러 원문을 사용자 친화 한국어 메시지로 매핑.
-// Why: Supabase 원본 message를 그대로 노출하면 내부 경로·스택을 누설할 수 있고
-//      비영어권 사용자에게 난해하다. 화면에는 반드시 이 모듈의 반환값만 사용한다.
+// Supabase Auth 에러 원문 → i18n key → 사용자 친화 메시지 매핑.
+// Why:
+//   1) Supabase 원본 message 를 그대로 노출하면 내부 경로·스택이 누설될 수 있고
+//      비영어권 사용자에게 난해하다 → 반드시 본 모듈 반환값만 UI 에 사용한다.
+//   2) 다국어 지원(Phase 10) — 문자열을 i18n key 로 관리해 ko/en/ja 일괄 반영.
+// 변경(2026-04-14):
+//   원문 하드코딩 → i18n key 반환으로 전환. 화면 렌더 쪽에서 t(key) 로 실제 문자열 획득.
+
+import { t } from '../lib/utils/i18n.js'
 
 const COMMON_MATCHERS = [
-  { keys: ['rate limit', 'too many'], message: '시도 횟수가 너무 많습니다. 잠시 후 다시 시도해 주세요.' },
-  { keys: ['network', 'failed to fetch', 'networkerror'], message: '네트워크 연결을 확인해 주세요.' },
-  { keys: ['timeout'], message: '서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해 주세요.' },
+  { keys: ['rate limit', 'too many'],                              i18nKey: 'error_rate_limit' },
+  { keys: ['network', 'failed to fetch', 'networkerror'],         i18nKey: 'error_network' },
+  { keys: ['timeout'],                                             i18nKey: 'error_timeout' },
 ]
 
 const LOGIN_MATCHERS = [
-  { keys: ['invalid login', 'invalid credentials', 'invalid grant'], message: '이메일 또는 비밀번호가 올바르지 않습니다.' },
-  { keys: ['email not confirmed'], message: '이메일 인증이 완료되지 않았습니다. 받은 편지함을 확인해 주세요.' },
-  { keys: ['user not found'], message: '등록되지 않은 이메일입니다.' },
-  { keys: ['account locked', 'banned'], message: '계정 이용이 제한되었습니다. 고객센터로 문의해 주세요.' },
+  { keys: ['invalid login', 'invalid credentials', 'invalid grant'], i18nKey: 'error_login_invalid' },
+  { keys: ['email not confirmed'],                                   i18nKey: 'error_login_unconfirmed' },
+  { keys: ['user not found'],                                        i18nKey: 'error_login_user_not_found' },
+  { keys: ['account locked', 'banned'],                              i18nKey: 'error_login_locked' },
 ]
 
 const SIGNUP_MATCHERS = [
-  { keys: ['already registered', 'user already', 'already exists'], message: '이미 가입된 이메일입니다. 로그인해 주세요.' },
-  { keys: ['weak password', 'password should'], message: '비밀번호가 너무 단순합니다. 더 복잡한 비밀번호를 사용해 주세요.' },
-  { keys: ['invalid email'], message: '올바른 이메일 주소를 입력해 주세요.' },
+  { keys: ['already registered', 'user already', 'already exists'],  i18nKey: 'error_signup_already' },
+  { keys: ['weak password', 'password should'],                      i18nKey: 'error_signup_weak' },
+  { keys: ['invalid email'],                                         i18nKey: 'error_signup_invalid_email' },
 ]
 
 const RESET_MATCHERS = [
-  { keys: ['user not found'], message: '등록되지 않은 이메일입니다.' },
+  { keys: ['user not found'],                                        i18nKey: 'error_reset_not_found' },
 ]
 
 const OAUTH_MATCHERS = [
-  { keys: ['state_mismatch'], message: '보안 검증에 실패했습니다. 페이지를 새로고침한 후 다시 시도해 주세요.' },
-  { keys: ['popup closed', 'user closed', 'cancelled', 'canceled'], message: 'Google 로그인이 취소되었습니다.' },
-  { keys: ['provider is not enabled'], message: '현재 Google 로그인을 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.' },
+  { keys: ['state_mismatch'],                                        i18nKey: 'error_oauth_state' },
+  { keys: ['popup closed', 'user closed', 'cancelled', 'canceled'],  i18nKey: 'error_oauth_cancelled' },
+  { keys: ['provider is not enabled'],                               i18nKey: 'error_oauth_unavailable' },
 ]
 
-function pickMessage(err, matchers, fallback) {
+function pickKey(err, matchers, fallbackKey) {
   const raw = (err && err.message) ? String(err.message).toLowerCase() : ''
   for (const m of matchers) {
-    if (m.keys.some((k) => raw.includes(k))) return m.message
+    if (m.keys.some((k) => raw.includes(k))) return m.i18nKey
   }
-  return fallback
+  return fallbackKey
 }
 
+// -----------------------------------------------------------------------------
+// Public — localized message strings (UI 에 바로 노출)
+// -----------------------------------------------------------------------------
+
 export function mapLoginError(err) {
-  return pickMessage(err, [...LOGIN_MATCHERS, ...COMMON_MATCHERS], '로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+  return t(pickKey(err, [...LOGIN_MATCHERS, ...COMMON_MATCHERS], 'error_login_generic'))
 }
 
 export function mapSignupError(err) {
-  return pickMessage(err, [...SIGNUP_MATCHERS, ...COMMON_MATCHERS], '가입 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+  return t(pickKey(err, [...SIGNUP_MATCHERS, ...COMMON_MATCHERS], 'error_signup_generic'))
 }
 
 export function mapResetError(err) {
-  return pickMessage(err, [...RESET_MATCHERS, ...COMMON_MATCHERS], '메일 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+  return t(pickKey(err, [...RESET_MATCHERS, ...COMMON_MATCHERS], 'error_reset_generic'))
 }
 
 export function mapOAuthError(err) {
-  return pickMessage(err, [...OAUTH_MATCHERS, ...COMMON_MATCHERS], 'Google 로그인 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+  return t(pickKey(err, [...OAUTH_MATCHERS, ...COMMON_MATCHERS], 'error_oauth_generic'))
 }
+
+// -----------------------------------------------------------------------------
+// Public — key-only variants (서버 로그·ARIA·테스트 용 — locale 무관한 안정 식별자)
+// -----------------------------------------------------------------------------
+
+export function mapLoginErrorKey(err)  { return pickKey(err, [...LOGIN_MATCHERS,  ...COMMON_MATCHERS], 'error_login_generic') }
+export function mapSignupErrorKey(err) { return pickKey(err, [...SIGNUP_MATCHERS, ...COMMON_MATCHERS], 'error_signup_generic') }
+export function mapResetErrorKey(err)  { return pickKey(err, [...RESET_MATCHERS,  ...COMMON_MATCHERS], 'error_reset_generic') }
+export function mapOAuthErrorKey(err)  { return pickKey(err, [...OAUTH_MATCHERS,  ...COMMON_MATCHERS], 'error_oauth_generic') }

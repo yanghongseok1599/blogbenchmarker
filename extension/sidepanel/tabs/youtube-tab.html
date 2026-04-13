@@ -2,58 +2,60 @@
   youtube-tab.html — YouTube → 블로그 변환 탭 UI
   panel.html 에서 동적으로 import 해서 탭 컨테이너에 주입되는 조각.
   외부 스크립트·인라인 핸들러 금지 (CSP 준수). 모든 동작은 youtube-tab.js 에서 addEventListener.
+  i18n: data-i18n / data-i18n-attr 속성은 applyI18n(root) 로 치환된다. (Phase 10)
 -->
 <section id="youtube-tab" class="tab-panel" role="tabpanel" aria-labelledby="tab-youtube">
   <header class="tab-header">
-    <h2 class="tab-title">YouTube → 블로그 변환</h2>
-    <p class="tab-subtitle">영상 URL 을 입력하면 자막을 가져와 블로그 초안을 만들어 드립니다.</p>
+    <h2 class="tab-title" data-i18n="youtube_title">YouTube → 블로그 변환</h2>
+    <p class="tab-subtitle" data-i18n="youtube_subtitle">영상 URL 을 입력하면 자막을 가져와 블로그 초안을 만들어 드립니다.</p>
   </header>
 
   <form id="yt-form" class="yt-form" novalidate>
-    <label for="yt-url" class="field-label">YouTube URL</label>
+    <label for="yt-url" class="field-label" data-i18n="youtube_label_url">YouTube URL</label>
     <input
       type="url"
       id="yt-url"
       name="videoUrl"
       class="field-input"
       placeholder="https://www.youtube.com/watch?v=..."
+      data-i18n-attr="placeholder:youtube_placeholder_url"
       autocomplete="off"
       required
     />
 
     <div class="yt-options">
-      <label class="field-label-sm" for="yt-length">분량</label>
+      <label class="field-label-sm" for="yt-length" data-i18n="youtube_label_length">분량</label>
       <select id="yt-length" class="field-select">
-        <option value="short">짧게 (800자)</option>
-        <option value="normal" selected>표준 (1200자)</option>
-        <option value="long">길게 (1800자)</option>
+        <option value="short"            data-i18n="youtube_length_short">짧게 (800자)</option>
+        <option value="normal" selected  data-i18n="youtube_length_normal">표준 (1200자)</option>
+        <option value="long"             data-i18n="youtube_length_long">길게 (1800자)</option>
       </select>
 
-      <label class="field-label-sm" for="yt-language">출력 언어</label>
+      <label class="field-label-sm" for="yt-language" data-i18n="youtube_label_language">출력 언어</label>
       <select id="yt-language" class="field-select">
-        <option value="ko" selected>한국어</option>
-        <option value="en">English</option>
-        <option value="ja">日本語</option>
+        <option value="ko" selected data-i18n="youtube_language_ko">한국어</option>
+        <option value="en"          data-i18n="youtube_language_en">English</option>
+        <option value="ja"          data-i18n="youtube_language_ja">日本語</option>
       </select>
     </div>
 
     <div id="yt-message" class="yt-message hidden" role="alert" aria-live="polite"></div>
 
     <button type="submit" id="yt-submit" class="btn-primary">
-      <span id="yt-submit-label">변환하기</span>
+      <span id="yt-submit-label" data-i18n="youtube_submit">변환하기</span>
     </button>
   </form>
 
   <section id="yt-result" class="yt-result hidden" aria-live="polite">
     <div class="yt-result-head">
       <div>
-        <div class="yt-result-label">생성된 블로그 포스트</div>
+        <div class="yt-result-label" data-i18n="youtube_result_label">생성된 블로그 포스트</div>
         <h3 id="yt-result-title" class="yt-result-title"></h3>
         <div id="yt-result-meta" class="yt-result-meta"></div>
       </div>
       <div class="yt-result-actions">
-        <button type="button" id="yt-btn-copy" class="btn-secondary">본문 복사</button>
-        <button type="button" id="yt-btn-to-generate" class="btn-primary">
+        <button type="button" id="yt-btn-copy" class="btn-secondary" data-i18n="youtube_btn_copy">본문 복사</button>
+        <button type="button" id="yt-btn-to-generate" class="btn-primary" data-i18n="youtube_btn_send">
           생성 탭으로 보내기
         </button>
       </div>
@@ -62,7 +64,7 @@
     <article id="yt-result-content" class="yt-result-content"></article>
 
     <details id="yt-transcript-wrap" class="yt-transcript">
-      <summary>원본 자막 보기</summary>
+      <summary data-i18n="youtube_transcript_toggle">원본 자막 보기</summary>
       <div id="yt-transcript-meta" class="yt-transcript-meta"></div>
       <pre id="yt-transcript-text" class="yt-transcript-text"></pre>
     </details>

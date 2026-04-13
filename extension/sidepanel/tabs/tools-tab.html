@@ -1,0 +1,16 @@
+<!-- extension/sidepanel/tabs/tools-tab.html
+     부가 도구 탭 마크업 조각. panel.js 가 mount(container) 호출 시 tools-tab.js 가 fetch 로 주입.
+     각 도구는 자기 슬롯에 렌더된다(tools-tab.js 가 createXxxCard() 반환 노드를 append). -->
+<div class="bm-tools">
+  <header class="bm-tools__head">
+    <h2 class="bm-tools__title">부가 도구</h2>
+    <p class="bm-tools__subtitle">글쓰기 보조 도구 4종</p>
+  </header>
+
+  <div class="bm-tools__slot" data-slot="counter" aria-label="글자 수 카운터"></div>
+  <div class="bm-tools__slot" data-slot="pomodoro" aria-label="뽀모도로 타이머"></div>
+  <div class="bm-tools__slot" data-slot="forbidden" aria-label="금칙어 검사"></div>
+  <div class="bm-tools__slot" data-slot="screenshot" aria-label="스크린샷"></div>
+
+  <p id="bm-tools-error" class="bm-tools__error" role="alert" hidden></p>
+</div>

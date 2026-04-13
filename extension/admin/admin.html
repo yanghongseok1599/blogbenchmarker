@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLOG BenchMarker — 관리자</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header class="ad-header">
+    <h1 class="ad-title">관리자 콘솔</h1>
+    <div class="ad-header__meta">
+      <span class="ad-header__email" data-role="me-email" aria-live="polite"></span>
+      <button type="button" class="ad-btn" data-action="reload">새로고침</button>
+    </div>
+  </header>
+
+  <div class="ad-gate" data-role="gate" hidden>
+    <p class="ad-gate__msg" data-role="gate-msg" aria-live="polite">권한 확인 중...</p>
+  </div>
+
+  <main class="ad-main" data-role="main" hidden>
+
+    <nav class="ad-tabs" role="tablist" aria-label="관리자 섹션">
+      <button class="ad-tab is-active" role="tab" data-tab="users" aria-selected="true">유저</button>
+      <button class="ad-tab" role="tab" data-tab="settings" aria-selected="false">앱 설정</button>
+      <button class="ad-tab" role="tab" data-tab="banwords" aria-selected="false">금칙어</button>
+      <button class="ad-tab" role="tab" data-tab="audit" aria-selected="false">감사 로그</button>
+    </nav>
+
+    <section class="ad-panel is-active" role="tabpanel" data-panel="users" aria-label="유저">
+      <div class="ad-toolbar">
+        <input type="search" class="ad-input" data-role="user-search" placeholder="이메일 또는 표시 이름 검색" aria-label="유저 검색" />
+        <button type="button" class="ad-btn" data-action="users-search">검색</button>
+        <span class="ad-toolbar__count" data-role="users-count" aria-live="polite"></span>
+      </div>
+      <div class="ad-status" data-role="users-status" role="status" aria-live="polite" hidden></div>
+      <div class="ad-table" data-role="users-table"></div>
+    </section>
+
+    <section class="ad-panel" role="tabpanel" data-panel="settings" aria-label="앱 설정" hidden>
+      <div class="ad-toolbar">
+        <button type="button" class="ad-btn" data-action="settings-reload">목록 새로고침</button>
+      </div>
+      <div class="ad-status" data-role="settings-status" role="status" aria-live="polite" hidden></div>
+      <div class="ad-table" data-role="settings-table"></div>
+      <details class="ad-details">
+        <summary>새 설정 추가 / 덮어쓰기</summary>
+        <div class="ad-form">
+          <label class="ad-form__row">
+            <span>key</span>
+            <input type="text" class="ad-input" data-role="setting-key" maxlength="200" />
+          </label>
+          <label class="ad-form__row">
+            <span>value (JSON)</span>
+            <textarea class="ad-input ad-input--text" data-role="setting-value" rows="4" placeholder='{"daily_free_quota": 3}'></textarea>
+          </label>
+          <button type="button" class="ad-btn ad-btn--primary" data-action="setting-save">저장</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="ad-panel" role="tabpanel" data-panel="banwords" aria-label="금칙어" hidden>
+      <div class="ad-toolbar">
+        <input type="text" class="ad-input" data-role="banword-input" maxlength="50" placeholder="추가할 단어" aria-label="금칙어 입력" />
+        <button type="button" class="ad-btn ad-btn--primary" data-action="banword-add">추가</button>
+      </div>
+      <div class="ad-status" data-role="banwords-status" role="status" aria-live="polite" hidden></div>
+      <ul class="ad-banwords" data-role="banwords-list" aria-label="금칙어 목록"></ul>
+    </section>
+
+    <section class="ad-panel" role="tabpanel" data-panel="audit" aria-label="감사 로그" hidden>
+      <div class="ad-toolbar">
+        <button type="button" class="ad-btn" data-action="audit-reload">새로고침</button>
+        <span class="ad-toolbar__count" data-role="audit-count" aria-live="polite"></span>
+      </div>
+      <div class="ad-status" data-role="audit-status" role="status" aria-live="polite" hidden></div>
+      <div class="ad-table" data-role="audit-table"></div>
+    </section>
+
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
