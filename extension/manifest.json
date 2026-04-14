@@ -20,8 +20,7 @@
     "https://ykyrdwllilffczgryvfv.supabase.co/*"
   ],
   "background": {
-    "service_worker": "background/service-worker.js",
-    "type": "module"
+    "service_worker": "background/service-worker.js"
   },
   "side_panel": {
     "default_path": "sidepanel/panel.html"
