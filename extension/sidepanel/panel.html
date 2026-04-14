@@ -6,40 +6,192 @@
   <title data-i18n="app_name">BLOG BenchMarker</title>
   <link rel="stylesheet" href="panel.css" />
 </head>
-<body>
-  <header class="bm-header">
-    <h1 class="bm-title" data-i18n="app_name">BLOG BenchMarker</h1>
+<body class="bm-body">
+  <!-- ─── 헤더: 로고 + 서비스명 + 로그인 유저 슬롯 ─── -->
+  <header class="bm-header" role="banner">
+    <div class="bm-header__brand">
+      <img
+        class="bm-header__logo"
+        src="../icons/icon48.png"
+        width="28"
+        height="28"
+        alt=""
+        aria-hidden="true"
+      />
+      <h1 class="bm-title" data-i18n="app_name">BLOG BenchMarker</h1>
+    </div>
+    <div class="bm-header__user" id="bm-user-slot" aria-live="polite">
+      <!-- panel.js 가 세션 조회 후 아바타 또는 로그인 버튼을 렌더 -->
+    </div>
   </header>
 
+  <!-- ─── 탭 네비게이션 (6탭, 이모지 + 라벨) ─── -->
   <nav class="bm-tabs" role="tablist" data-i18n-aria="tabs_aria_label" aria-label="기능 탭">
-    <button class="bm-tab is-active" role="tab" data-tab="analyze"   aria-selected="true"  data-i18n="tab_analyze">분석</button>
-    <button class="bm-tab" role="tab" data-tab="benchmark" aria-selected="false" data-i18n="tab_benchmark">벤치마크</button>
-    <button class="bm-tab" role="tab" data-tab="generate"  aria-selected="false" data-i18n="tab_generate">생성</button>
-    <button class="bm-tab" role="tab" data-tab="mypage"    aria-selected="false" data-i18n="tab_mypage">마이</button>
+    <button
+      class="bm-tab is-active"
+      role="tab"
+      type="button"
+      data-tab="analyze"
+      id="bm-tab-analyze"
+      aria-selected="true"
+      aria-controls="bm-panel-analyze"
+      tabindex="0"
+    >
+      <span class="bm-tab__icon" aria-hidden="true">📊</span>
+      <span class="bm-tab__label" data-i18n="tab_analyze">분석</span>
+    </button>
+    <button
+      class="bm-tab"
+      role="tab"
+      type="button"
+      data-tab="benchmark"
+      id="bm-tab-benchmark"
+      aria-selected="false"
+      aria-controls="bm-panel-benchmark"
+      tabindex="-1"
+    >
+      <span class="bm-tab__icon" aria-hidden="true">🏆</span>
+      <span class="bm-tab__label" data-i18n="tab_benchmark">벤치마크</span>
+    </button>
+    <button
+      class="bm-tab"
+      role="tab"
+      type="button"
+      data-tab="generate"
+      id="bm-tab-generate"
+      aria-selected="false"
+      aria-controls="bm-panel-generate"
+      tabindex="-1"
+    >
+      <span class="bm-tab__icon" aria-hidden="true">✨</span>
+      <span class="bm-tab__label" data-i18n="tab_generate">생성</span>
+    </button>
+    <button
+      class="bm-tab"
+      role="tab"
+      type="button"
+      data-tab="learning"
+      id="bm-tab-learning"
+      aria-selected="false"
+      aria-controls="bm-panel-learning"
+      tabindex="-1"
+    >
+      <span class="bm-tab__icon" aria-hidden="true">📚</span>
+      <span class="bm-tab__label" data-i18n="tab_learning">학습</span>
+    </button>
+    <button
+      class="bm-tab"
+      role="tab"
+      type="button"
+      data-tab="tools"
+      id="bm-tab-tools"
+      aria-selected="false"
+      aria-controls="bm-panel-tools"
+      tabindex="-1"
+    >
+      <span class="bm-tab__icon" aria-hidden="true">🛠️</span>
+      <span class="bm-tab__label" data-i18n="tab_tools">도구</span>
+    </button>
+    <button
+      class="bm-tab"
+      role="tab"
+      type="button"
+      data-tab="mypage"
+      id="bm-tab-mypage"
+      aria-selected="false"
+      aria-controls="bm-panel-mypage"
+      tabindex="-1"
+    >
+      <span class="bm-tab__icon" aria-hidden="true">👤</span>
+      <span class="bm-tab__label" data-i18n="tab_mypage">마이</span>
+    </button>
   </nav>
 
-  <main class="bm-panels">
-    <section class="bm-panel is-active" role="tabpanel" data-panel="analyze"   data-i18n-aria="tab_analyze"   aria-label="분석">
-      <!-- Phase 2.x 에서 analyze-tab.js 가 렌더 -->
-      <p class="bm-placeholder" data-i18n="placeholder_analyze">분석 탭 (골격)</p>
+  <!-- ─── 탭 패널 컨테이너 ─── -->
+  <main class="bm-panels" id="bm-panels">
+    <section
+      class="bm-panel is-active"
+      role="tabpanel"
+      data-panel="analyze"
+      id="bm-panel-analyze"
+      aria-labelledby="bm-tab-analyze"
+    >
+      <p class="bm-placeholder" data-i18n="placeholder_analyze">분석 탭 준비 중…</p>
     </section>
 
-    <section class="bm-panel" role="tabpanel" data-panel="benchmark" data-i18n-aria="tab_benchmark" aria-label="벤치마크" hidden>
-      <!-- Phase 4.x 에서 benchmark-tab.js 가 렌더 -->
-      <p class="bm-placeholder" data-i18n="placeholder_benchmark">벤치마크 탭 (골격)</p>
+    <section
+      class="bm-panel"
+      role="tabpanel"
+      data-panel="benchmark"
+      id="bm-panel-benchmark"
+      aria-labelledby="bm-tab-benchmark"
+      hidden
+    >
+      <p class="bm-placeholder" data-i18n="placeholder_benchmark">벤치마크 탭 준비 중…</p>
     </section>
 
-    <section class="bm-panel" role="tabpanel" data-panel="generate"  data-i18n-aria="tab_generate"  aria-label="생성" hidden>
-      <!-- Phase 3.x 에서 generate-tab.js 가 렌더 -->
-      <p class="bm-placeholder" data-i18n="placeholder_generate">생성 탭 (골격)</p>
+    <section
+      class="bm-panel"
+      role="tabpanel"
+      data-panel="generate"
+      id="bm-panel-generate"
+      aria-labelledby="bm-tab-generate"
+      hidden
+    >
+      <p class="bm-placeholder" data-i18n="placeholder_generate">생성 탭 준비 중…</p>
     </section>
 
-    <section class="bm-panel" role="tabpanel" data-panel="mypage"    data-i18n-aria="tab_mypage"    aria-label="마이" hidden>
-      <!-- Phase 5.x 에서 settings/mypage 탭이 렌더 -->
-      <p class="bm-placeholder" data-i18n="placeholder_mypage">마이 탭 (골격)</p>
+    <section
+      class="bm-panel"
+      role="tabpanel"
+      data-panel="learning"
+      id="bm-panel-learning"
+      aria-labelledby="bm-tab-learning"
+      hidden
+    >
+      <p class="bm-placeholder" data-i18n="placeholder_learning">학습 탭 준비 중…</p>
+    </section>
+
+    <section
+      class="bm-panel"
+      role="tabpanel"
+      data-panel="tools"
+      id="bm-panel-tools"
+      aria-labelledby="bm-tab-tools"
+      hidden
+    >
+      <p class="bm-placeholder" data-i18n="placeholder_tools">도구 탭 준비 중…</p>
+    </section>
+
+    <section
+      class="bm-panel"
+      role="tabpanel"
+      data-panel="mypage"
+      id="bm-panel-mypage"
+      aria-labelledby="bm-tab-mypage"
+      hidden
+    >
+      <p class="bm-placeholder" data-i18n="placeholder_mypage">마이 탭 준비 중…</p>
     </section>
   </main>
-    <script type="module">
+
+  <!-- ─── 푸터: 버전 + 도움말 ─── -->
+  <footer class="bm-footer" role="contentinfo">
+    <span class="bm-footer__version" id="bm-footer-version">v0.1.0</span>
+    <a
+      class="bm-footer__help"
+      id="bm-help-link"
+      href="#"
+      role="button"
+      aria-label="도움말 (FAQ)"
+      title="도움말 (FAQ)"
+    >
+      <span class="bm-footer__help-icon" aria-hidden="true">?</span>
+      <span class="bm-footer__help-label" data-i18n="footer_help">도움말</span>
+    </a>
+  </footer>
+
+  <script type="module">
     import { initI18n } from '../lib/utils/i18n.js'
     initI18n().catch((e) => console.warn('[i18n/panel] init failed', e?.message))
   </script>
