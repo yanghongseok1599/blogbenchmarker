@@ -14,6 +14,7 @@ import { benchmarkHandler } from './benchmark-handler.js'
 import { generateHandler } from './generate-handler.js'
 import { learningHandler } from './learning-handler.js'
 import { pomodoroHandler } from './pomodoro-handler.js'
+import { analyzeHandler } from './analyze-handler.js'
 import { ensureBenchmarkAlarm } from '../schedulers/benchmark-sync.js'
 
 /**
@@ -25,6 +26,7 @@ import { ensureBenchmarkAlarm } from '../schedulers/benchmark-sync.js'
  * @type {Readonly<Record<string, (payload: any, sender: chrome.runtime.MessageSender) => Promise<any>>>}
  */
 export const routes = Object.freeze({
+  'analyze.post':            (payload) => analyzeHandler.post(payload),
   'auth.login':              (payload) => authHandler.login(payload),
   'auth.signup':             (payload) => authHandler.signup(payload),
   'auth.logout':             ()        => authHandler.logout(),
