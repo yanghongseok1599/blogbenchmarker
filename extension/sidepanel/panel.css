@@ -909,6 +909,214 @@ em, i, cite, address, dfn, var { font-style: normal; }
 *::-webkit-scrollbar-thumb:hover { background: var(--text-4); }
 
 /* ========================================================================
+ * --- 21. 공통 탭 카드 (.bm-analyze / .bm-benchmark / .bm-learning /
+ *          .bm-mypage / .bm-tools / .bm-generate) — 글래스 카드 통일
+ * ======================================================================== */
+
+.bm-analyze,
+.bm-benchmark,
+.bm-learning,
+.bm-mypage,
+.bm-tools {
+  background: var(--glass-1, rgba(255,255,255,0.72));
+  backdrop-filter: var(--blur, blur(22px) saturate(180%));
+  -webkit-backdrop-filter: var(--blur, blur(22px) saturate(180%));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.5));
+  border-radius: var(--r-card, 16px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: var(--shadow-glass);
+}
+@supports not (backdrop-filter: blur(10px)) {
+  .bm-analyze, .bm-benchmark, .bm-learning, .bm-mypage, .bm-tools {
+    background: var(--glass-1-solid, #fff);
+  }
+}
+
+/* 공통 탭 헤더 (제목 + 힌트 + hairline) */
+.bm-analyze__head,
+.bm-benchmark__head,
+.bm-learning__head,
+.bm-mypage__head,
+.bm-tools__head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(15,31,23,0.08);
+}
+
+/* 제목 */
+.bm-analyze__title,
+.bm-benchmark__title,
+.bm-learning__title,
+.bm-mypage__title,
+.bm-tools__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text, #141628);
+  letter-spacing: -0.015em;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* 힌트 */
+.bm-analyze__hint,
+.bm-benchmark__hint,
+.bm-learning__hint,
+.bm-mypage__hint,
+.bm-tools__hint {
+  font-size: 13px;
+  color: var(--text-3, #6A6D85);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* head 내 액션 버튼 */
+.bm-learning__head-row,
+.bm-benchmark__head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.bm-learning__head-actions,
+.bm-benchmark__head-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Status 배너 공통 */
+.bm-analyze__status,
+.bm-benchmark__status,
+.bm-learning__status,
+.bm-mypage__status,
+.bm-tools__status {
+  padding: 10px 14px;
+  background: var(--accent-bg-2, #EEF4F0);
+  border: 1px solid rgba(47,95,74,0.14);
+  border-radius: var(--r-ctrl, 10px);
+  font-size: 12px;
+  color: var(--accent, #2F5F4A);
+}
+.bm-analyze__status--error,
+.bm-benchmark__status--error,
+.bm-learning__status--error,
+.bm-tools__status--error {
+  background: var(--poor-bg);
+  border-color: rgba(194,74,74,0.3);
+  color: var(--poor, #C24A4A);
+}
+
+/* 빈 상태 카드 */
+.bm-benchmark__empty,
+.bm-learning__empty,
+.bm-mypage__empty,
+.bm-tools__empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-3, #6A6D85);
+  font-size: 13px;
+  background: rgba(15,31,23,0.02);
+  border: 1px dashed rgba(15,31,23,0.1);
+  border-radius: var(--r-ctrl, 10px);
+}
+
+/* 리스트 아이템 공통 (벤치마크 블로그 / 학습 데이터 / 도구) */
+.bm-benchmark__list,
+.bm-learning__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.bm-benchmark__item,
+.bm-learning__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(15,31,23,0.08);
+  border-radius: var(--r-ctrl, 10px);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.bm-benchmark__item:hover,
+.bm-learning__item:hover {
+  background: var(--accent-bg-2, #EEF4F0);
+  border-color: rgba(47,95,74,0.18);
+}
+
+.bm-benchmark__item-body,
+.bm-learning__item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.bm-benchmark__item-name,
+.bm-learning__item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text, #141628);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bm-benchmark__item-url,
+.bm-learning__item-url {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3, #6A6D85);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 폼 (벤치마크 URL 추가 폼 등) */
+.bm-benchmark__form,
+.bm-learning__form {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.bm-benchmark__form .bm-input,
+.bm-learning__form .bm-input {
+  flex: 1;
+}
+
+/* Count badge */
+.bm-learning__count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent, #2F5F4A);
+  background: var(--accent-bg-2, #EEF4F0);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+/* 에러 카드 공통 */
+.bm-mypage__error,
+.bm-tools__error,
+.bm-tools__slot-error {
+  padding: 14px 16px;
+  background: var(--poor-bg);
+  border: 1px solid rgba(194,74,74,0.25);
+  border-radius: var(--r-ctrl, 10px);
+  font-size: 13px;
+  color: var(--poor, #C24A4A);
+  line-height: 1.5;
+}
+
+
+/* ========================================================================
  * --- 21-extra. AI 글 생성 폼 (.bm-generate) — 그린 대시보드 폼 ---------
  * ======================================================================== */
 
