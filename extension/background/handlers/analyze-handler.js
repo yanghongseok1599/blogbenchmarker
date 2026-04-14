@@ -14,6 +14,7 @@
 //   - 추출된 텍스트는 textContent 기반이라 XSS 위험 없음.
 
 import { analyze as analyzeSeo } from '../../lib/analyzers/seo-analyzer.js'
+import { analyzeStructure } from '../../lib/analyzers/structure-analyzer.js'
 
 const NAVER_BLOG_HOST_RE = /^(?:m\.)?(?:[a-z0-9-]+\.)?blog\.naver\.com$/i
 
@@ -52,7 +53,40 @@ function extractFromDOM() {
   const contentEl = findFirst(CONTENT_SELECTORS)
 
   const title = titleEl?.textContent?.trim() || ''
-  const content = contentEl?.textContent?.trim() || ''
+
+  // 구조 분석을 위해 블록 단위로 개행 보존해서 content 추출
+  function extractBlockedText(root) {
+    if (!root) return ''
+    const BLOCK_SELECTOR = [
+      'p', 'div.se-text-paragraph', 'div.se-module-text',
+      '.se-component-content', '.se-component',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'li', 'blockquote',
+      'strong', 'b', // 굵은 라인 단독 블록 가능성
+    ].join(',')
+    const blocks = root.querySelectorAll(BLOCK_SELECTOR)
+    if (blocks.length === 0) {
+      // fallback: textContent 그대로 + innerText 비슷한 분리
+      return (root.innerText || root.textContent || '').trim()
+    }
+    const lines = []
+    blocks.forEach((el) => {
+      const t = (el.textContent || '').trim()
+      if (t && t.length > 0) lines.push(t)
+    })
+    // 중복 제거 (중첩 요소로 인한 같은 텍스트 반복)
+    const seen = new Set()
+    const dedup = []
+    for (const l of lines) {
+      if (!seen.has(l)) {
+        seen.add(l)
+        dedup.push(l)
+      }
+    }
+    return dedup.join('\n')
+  }
+
+  const content = extractBlockedText(contentEl)
 
   if (!content) {
     return { title: '', content: '', images: [], meta: { url: location.href } }
@@ -102,7 +136,7 @@ async function resolveTargetTab(payload) {
  * SEO 분석 결과를 사이드패널이 기대하는 shape 으로 변환.
  * { totalScore, sections[], stats, url, title }
  */
-function buildUiShape({ url, title, stats, analysis }) {
+function buildUiShape({ url, title, stats, analysis, structure }) {
   const s = analysis.sections || {}
   const sections = [
     s.titleSeo       && { key: 'titleSeo',       title: '제목 SEO',      score: s.titleSeo.score,       recommendations: s.titleSeo.recommendations || [] },
@@ -120,14 +154,42 @@ function buildUiShape({ url, title, stats, analysis }) {
     stats: stats || analysis.stats || {},
     recommendations: analysis.recommendations || [],
     warnings: analysis.warnings || [],
+    structure: structure || null,
   }
 }
 
 /**
+ * 직접 전달된 title + body(content) 로 분석 수행.
+ * writing-page sidebar-bridge 에서 실시간 편집 중인 내용을 분석할 때 사용.
+ */
+function analyzeDirect({ title = '', content = '', images = [], url = '' }) {
+  const analysis = analyzeSeo({ title, content, images })
+  const structure = analyzeStructure({ title, content, images })
+  return buildUiShape({
+    url,
+    title,
+    stats: analysis.stats,
+    analysis,
+    structure,
+  })
+}
+
+/**
  * 분석 메인.
- * @param {{ url?: string }} payload
+ * @param {{ url?: string, title?: string, body?: string, content?: string }} payload
  */
 async function analyzePost(payload) {
+  // 직접 모드: 작성 중인 글을 title+body 로 바로 전달받은 경우(글쓰기 사이드바)
+  const directTitle = payload?.title
+  const directBody = payload?.body ?? payload?.content
+  if (typeof directTitle === 'string' && typeof directBody === 'string') {
+    return analyzeDirect({
+      title: directTitle,
+      content: directBody,
+      url: payload.url || '',
+    })
+  }
+
   const tab = await resolveTargetTab(payload)
   if (!tab?.id) throw new Error('활성 탭을 찾을 수 없습니다.')
 
@@ -167,11 +229,18 @@ async function analyzePost(payload) {
     images: best.images,
   })
 
+  const structure = analyzeStructure({
+    title: best.title,
+    content: best.content,
+    images: best.images,
+  })
+
   return buildUiShape({
     url: tab.url,
     title: best.title,
     stats: analysis.stats,
     analysis,
+    structure,
   })
 }
 

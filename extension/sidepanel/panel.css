@@ -838,7 +838,317 @@ input::placeholder, textarea::placeholder {
 }
 .bm-rule { border: 0; border-top: 1px solid var(--border); margin: var(--sp-4) 0; }
 
-/* --- 19. Responsive ------------------------------------------------------ */
+/* --- 19. Structure card (구조 분석) ------------------------------------- */
+
+.bm-structure-card {
+  gap: var(--sp-4);
+}
+.bm-structure-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border-soft);
+}
+.bm-structure-card__head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bm-structure-card__score {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.bm-structure-card__score-value {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--text);
+  line-height: 1;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  letter-spacing: -0.02em;
+}
+.bm-structure-card__score-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-left: 2px;
+}
+.bm-structure-card__score.is-good .bm-structure-card__score-value { color: var(--good); }
+.bm-structure-card__score.is-warn .bm-structure-card__score-value { color: var(--warn); }
+.bm-structure-card__score.is-poor .bm-structure-card__score-value { color: var(--poor); }
+
+/* 구조 바 */
+.bm-structure-bar {
+  display: flex;
+  gap: 2px;
+  height: 36px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+.bm-structure-bar__seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  transition: background var(--dur) var(--ease);
+}
+.bm-structure-bar__seg:hover {
+  background: color-mix(in srgb, var(--text) 8%, var(--surface-alt));
+}
+.bm-structure-bar__seg--intro {
+  background: color-mix(in srgb, var(--info) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--info) 25%, var(--border));
+  color: var(--info);
+}
+.bm-structure-bar__seg--outro {
+  background: color-mix(in srgb, var(--good) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--good) 25%, var(--border));
+  color: var(--good);
+}
+.bm-structure-bar__seg--section {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.bm-structure-bar__label {
+  font-family: var(--font);
+  font-weight: 600;
+}
+.bm-structure-bar--empty {
+  background: var(--surface-alt);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+/* 체크리스트 */
+.bm-structure-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.bm-structure-checklist__item {
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm);
+}
+.bm-structure-checklist__item.is-warn {
+  background: color-mix(in srgb, var(--warn) 6%, var(--surface));
+  border-color: color-mix(in srgb, var(--warn) 22%, var(--border));
+}
+.bm-structure-checklist__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.bm-structure-checklist__left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.bm-structure-checklist__icon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.bm-structure-checklist__icon.is-ok {
+  background: color-mix(in srgb, var(--good) 15%, var(--surface));
+  color: var(--good);
+}
+.bm-structure-checklist__icon.is-warn {
+  background: color-mix(in srgb, var(--warn) 18%, var(--surface));
+  color: var(--warn);
+}
+.bm-structure-checklist__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.bm-structure-checklist__detail {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+}
+.bm-structure-checklist__hint {
+  margin-top: 4px;
+  padding-left: 24px;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* 목차 */
+.bm-structure-toc { display: flex; flex-direction: column; gap: var(--sp-2); }
+.bm-structure-toc__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+}
+.bm-structure-toc__list {
+  list-style: none;
+  counter-reset: bm-toc;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bm-structure-toc__item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: var(--sp-2);
+  align-items: center;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.bm-structure-toc__item:hover {
+  border-color: var(--border);
+  background: var(--surface-alt);
+}
+.bm-structure-toc__item.is-poor {
+  border-left: 3px solid var(--poor);
+}
+.bm-structure-toc__item.is-warn {
+  border-left: 3px solid var(--warn);
+}
+.bm-structure-toc__item.is-good {
+  border-left: 3px solid var(--good);
+}
+.bm-structure-toc__marker {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+}
+.bm-structure-toc__heading {
+  font-size: 13px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bm-structure-toc__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+}
+.bm-structure-toc--empty {
+  padding: var(--sp-4);
+  background: color-mix(in srgb, var(--warn) 6%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--warn) 30%, var(--border));
+  border-radius: var(--r-sm);
+}
+.bm-structure-toc__empty {
+  font-size: 12px;
+  color: var(--warn);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------------
+ * Writing guide — 네이버 글쓰기 페이지 주입형 실시간 체크리스트
+ * (sidebar-injector.js → shadow DOM 안에서 사용)
+ * ------------------------------------------------------------------------ */
+
+.bm-guide {
+  all: initial;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  box-shadow: var(--shadow);
+}
+.bm-guide * { box-sizing: border-box; font-family: inherit; color: inherit; margin: 0; padding: 0; }
+
+.bm-guide__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.bm-guide__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.bm-guide__score {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.bm-guide__score.is-good { color: var(--good); }
+.bm-guide__score.is-warn { color: var(--warn); }
+.bm-guide__score.is-poor { color: var(--poor); }
+.bm-guide__score-sub { font-size: 10px; color: var(--text-3); margin-left: 2px; }
+
+.bm-guide__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.bm-guide__item {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.bm-guide__icon {
+  width: 16px; height: 16px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  font-size: 10px; font-weight: 700;
+}
+.bm-guide__icon.is-ok { background: color-mix(in srgb, var(--good) 15%, var(--surface)); color: var(--good); }
+.bm-guide__icon.is-warn { background: color-mix(in srgb, var(--warn) 18%, var(--surface)); color: var(--warn); }
+.bm-guide__label { font-size: 13px; color: var(--text-2); }
+.bm-guide__detail {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.bm-guide__next {
+  padding: var(--sp-3);
+  background: var(--surface-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.bm-guide__next strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* --- 20. Responsive ------------------------------------------------------ */
 
 @media (max-width: 380px) {
   .bm-panels, main { padding: var(--sp-4); }

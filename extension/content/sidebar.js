@@ -89,9 +89,109 @@ function renderSuggestions(list) {
   }
   const ul = createEl('ul', { style: { margin: 0, paddingLeft: '16px' } })
   for (const item of list) {
-    ul.appendChild(createEl('li', {}, String(item)))
+    const text = typeof item === 'string' ? item : item?.text || String(item)
+    ul.appendChild(createEl('li', {}, text))
   }
   clearAndAppend(slot, ul)
+}
+
+/**
+ * 구조 가이드 — 작성 중인 글의 구조를 체크리스트로 표시.
+ * structure shape: { title, intro, sections, outro, totals, score, recommendations, ideal }
+ */
+function renderStructure(structure) {
+  const slot = $('bbm-slot-structure')
+  if (!slot) return
+  if (!structure || typeof structure !== 'object') {
+    clearAndAppend(slot, createEl('span', { className: 'bbm-empty' }, '제목과 본문을 입력하면 구조가 표시됩니다.'))
+    return
+  }
+
+  const { score, totals, intro, sections, outro, ideal } = structure
+  const checks = [
+    {
+      label: '제목',
+      detail: `${(structure.title || '').length}자`,
+      ok: score.titleQuality >= 70,
+    },
+    {
+      label: '도입부',
+      detail: `${intro?.charCount || 0}자 · ${intro?.paragraphCount || 0}단락`,
+      ok: score.introQuality >= 70,
+    },
+    {
+      label: '섹션',
+      detail: `${totals.sectionCount}개`,
+      ok: score.sectionCountQuality >= 70,
+      hint: totals.sectionCount === 0
+        ? '▶, ■ 또는 「1.」 로 소제목을 추가하세요.'
+        : null,
+    },
+    {
+      label: '섹션 균형',
+      detail: sections.length
+        ? `평균 ${Math.round(sections.reduce((a, s) => a + s.charCount, 0) / sections.length)}자`
+        : '-',
+      ok: score.sectionBalance >= 70,
+    },
+    {
+      label: '이미지',
+      detail: `${totals.imageCount}장`,
+      ok: score.imageDistribution >= 70,
+    },
+    {
+      label: '마무리',
+      detail: outro ? `${outro.charCount}자` : '—',
+      ok: !outro || score.outroQuality >= 60,
+    },
+  ]
+
+  const header = createEl('div', { className: 'bbm-guide-head' }, [
+    createEl('span', { className: 'bbm-guide-title' }, ['구조 점수']),
+    createEl('strong', { className: `bbm-guide-score ${scoreClass(score.total)}` },
+      [`${score.total}`, createEl('span', { className: 'bbm-guide-score-sub' }, [' /100'])]
+    ),
+  ])
+
+  const list = createEl('ul', { className: 'bbm-guide-list' },
+    checks.map((c) =>
+      createEl('li', { className: `bbm-guide-item ${c.ok ? 'ok' : 'warn'}` }, [
+        createEl('span', { className: `bbm-guide-icon ${c.ok ? 'ok' : 'warn'}` }, [c.ok ? '✓' : '!']),
+        createEl('span', { className: 'bbm-guide-label' }, [c.label]),
+        createEl('span', { className: 'bbm-guide-detail' }, [c.detail]),
+      ])
+    )
+  )
+
+  // 다음 단계 가이드
+  const nextHint = getNextHint(structure)
+  const children = [header, list]
+  if (nextHint) {
+    children.push(
+      createEl('p', { className: 'bbm-guide-next' },
+        [createEl('strong', {}, ['다음 단계 · ']), nextHint]
+      )
+    )
+  }
+
+  clearAndAppend(slot, ...children)
+}
+
+function scoreClass(n) {
+  if (n >= 80) return 'is-good'
+  if (n >= 60) return 'is-warn'
+  return 'is-poor'
+}
+
+/**
+ * 가장 높은 우선순위 recommendation 1개를 "다음 단계" 힌트로.
+ */
+function getNextHint(structure) {
+  const recs = structure.recommendations || []
+  const high = recs.find((r) => r.priority === 'high')
+  const medium = recs.find((r) => r.priority === 'medium')
+  const pick = high || medium || recs[0]
+  return pick ? pick.text : null
 }
 
 function renderError(code) {
@@ -125,6 +225,13 @@ function humanizeKey(key) {
   return map[key] || key
 }
 
+function findHookRec(d) {
+  // sections 배열에서 hookScore 섹션 찾기
+  const hookSec = (d.sections || []).find((s) => s.key === 'hookScore')
+  if (!hookSec) return null
+  return { score: hookSec.score, text: '첫 문단 후킹 점수' }
+}
+
 function handleMessage(event) {
   // 보안: 발신 origin 을 extension origin 으로 제한.
   if (EXTENSION_ORIGIN && event.origin !== EXTENSION_ORIGIN) return
@@ -139,10 +246,17 @@ function handleMessage(event) {
 
   if (status === 'ok' && payload.data) {
     const d = payload.data
-    renderScore(d.score, d.scoreHint)
-    renderBasic(d.basic || d.metrics || null)
-    renderHook(d.hook || null)
-    renderSuggestions(d.suggestions || [])
+    // analyze-handler 응답 shape 은 { totalScore, sections[], stats, structure, recommendations, ... }
+    // 사이드바는 구조 가이드 + 기본 지표 + 개선 제안만 사용.
+    renderScore(
+      typeof d.totalScore === 'number' ? d.totalScore : d.score,
+      d.scoreHint,
+    )
+    const basic = d.stats || d.basic || d.metrics || null
+    renderBasic(basic)
+    renderHook(d.hook || findHookRec(d))
+    renderStructure(d.structure || null)
+    renderSuggestions(d.recommendations || d.suggestions || [])
     return
   }
 

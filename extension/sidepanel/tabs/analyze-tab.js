@@ -34,6 +34,7 @@ import { createScoreCard } from '../components/score-card.js'
 import { createTotalScoreGauge } from '../components/total-score-gauge.js'
 import { createStatsStrip } from '../components/stats-strip.js'
 import { createRecommendationList } from '../components/recommendation-list.js'
+import { createStructureCard } from '../components/structure-card.js'
 
 // ────────────────────────────────────────────────────────────
 // 상수
@@ -321,6 +322,7 @@ function renderSkeleton() {
     ['분석 중입니다. 잠시만 기다려 주세요.'],
   )
   clearAndAppend(refs.body, heroSkeleton, stripSkeleton, grid, srStatus)
+  scrollPanelToTop()
 }
 
 /**
@@ -352,6 +354,7 @@ function renderErrorCard(message) {
     [icon, title, body, retry],
   )
   clearAndAppend(refs.body, card)
+  scrollPanelToTop()
 }
 
 /**
@@ -388,7 +391,14 @@ function renderDashboard(data) {
 
   const recList = createRecommendationList(safe.recommendations, { sections: safe.sections })
 
-  const children = [hero, strip, grid, recList]
+  // 구조 분석 카드 (blog structure)
+  const structureCard = data?.structure
+    ? createStructureCard(data.structure)
+    : null
+
+  const children = [hero, strip, grid]
+  if (structureCard) children.push(structureCard)
+  children.push(recList)
 
   // warnings 가 있으면 상단 한 줄 안내 (너무 짧은 글 등)
   if (safe.warnings.length > 0) {
@@ -396,6 +406,7 @@ function renderDashboard(data) {
   }
 
   clearAndAppend(refs.body, ...children)
+  scrollPanelToTop()
 }
 
 function buildHero(safe) {
@@ -562,6 +573,40 @@ function extractBlogId(url) {
 function prettyError(err) {
   if (!err) return '알 수 없는 오류'
   return err.message ? String(err.message) : String(err)
+}
+
+/**
+ * 렌더 직후 스크롤을 최상단으로 복귀.
+ *
+ * Why: 이전 상태(빈 / 스켈레톤) → 새 상태(대시보드) 로 body 를 교체하면
+ *      브라우저가 이전 scroll offset 을 유지하거나, focus 가 사라진 버튼을
+ *      뒤따라가면서 상위 `bm-header` / `bm-tabs` 영역이 clip 되는 현상이 보고됨.
+ *      본 함수는 window + scrollingElement 양쪽을 0 으로 리셋해 탭 네비게이션이
+ *      항상 최상단에 드러나도록 보장한다.
+ *
+ *   - behavior: 'auto' — 즉시 이동 (사용자 인지 충격 최소)
+ *   - rAF 로 한 프레임 늦춤 → 새 DOM 레이아웃이 계산된 뒤에 스크롤 반영
+ *   - CSS / panel.html 변경 없이 JS 단독으로 해결 (기획자 pane 1 의 panel.css 영역 침범 금지)
+ */
+function scrollPanelToTop() {
+  const reset = () => {
+    try {
+      if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      }
+    } catch { /* ignore */ }
+    try {
+      const se = document.scrollingElement
+      if (se) se.scrollTop = 0
+      if (document.documentElement) document.documentElement.scrollTop = 0
+      if (document.body) document.body.scrollTop = 0
+    } catch { /* ignore */ }
+  }
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(reset)
+  } else {
+    reset()
+  }
 }
 
 // ────────────────────────────────────────────────────────────
