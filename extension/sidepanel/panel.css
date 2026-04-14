@@ -902,3 +902,223 @@ em, i, cite, address, dfn, var { font-style: normal; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background: var(--glass-border-strong); border-radius: var(--r-pill); }
 *::-webkit-scrollbar-thumb:hover { background: var(--text-4); }
+
+/* ========================================================================
+ * --- 22. Recommendations list (.bm-recs) — 가독성 대폭 개선 --------------
+ *   빡빡하게 붙어 렌더되던 영역을 그룹/아이템 단위로 명확히 분리.
+ * ======================================================================== */
+
+.bm-recs {
+  background: var(--surface, #fff);
+  border-radius: var(--r, 14px);
+  padding: 20px;
+  box-shadow: var(--shadow, 0 6px 18px rgba(15,31,23,0.06));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.bm-recs--glass {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+@media (prefers-color-scheme: dark) {
+  .bm-recs, .bm-recs--glass {
+    background: rgba(26,32,30,0.72);
+    border-color: rgba(255,255,255,0.08);
+  }
+}
+
+/* 헤더: "추천사항" + 개수 */
+.bm-recs__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(15,31,23,0.08);
+}
+.bm-recs__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text, #1A1614);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.bm-recs__count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4A6B4D;
+  background: rgba(74,107,77,0.12);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+/* 카테고리 그룹 — 각 그룹 사이 여백 + 옅은 구분선 */
+.bm-recs__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: transparent;
+}
+.bm-recs__group + .bm-recs__group {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(15,31,23,0.06);
+}
+
+/* <details>/<summary> 구조 */
+.bm-recs__group summary.bm-recs__group-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(15,31,23,0.03);
+  transition: background 160ms ease;
+  user-select: none;
+}
+.bm-recs__group summary.bm-recs__group-summary::-webkit-details-marker { display: none; }
+.bm-recs__group summary.bm-recs__group-summary::marker { display: none; }
+.bm-recs__group summary.bm-recs__group-summary:hover {
+  background: rgba(15,31,23,0.06);
+}
+.bm-recs__group summary.bm-recs__group-summary::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  opacity: 0.5;
+  margin-right: 2px;
+  transition: transform 180ms ease;
+}
+.bm-recs__group[open] summary.bm-recs__group-summary::before {
+  transform: rotate(90deg);
+}
+
+.bm-recs__group-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(184,116,44,0.12);
+  color: #B8742C;
+  flex-shrink: 0;
+}
+.bm-recs__group-icon .bm-icon { width: 14px; height: 14px; }
+.bm-recs__group-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text, #1A1614);
+  flex: 1;
+}
+.bm-recs__group-count {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3, #7A6A5F);
+  background: rgba(255,255,255,0.8);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* 추천 아이템 리스트 — summary 아래 */
+.bm-recs__list {
+  list-style: none;
+  padding: 12px 4px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+/* 개별 추천 아이템 */
+.bm-recs__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(15,31,23,0.02);
+  border-radius: 10px;
+  border-left: 3px solid transparent;
+  line-height: 1.55;
+}
+.bm-recs__item--high {
+  background: rgba(217,84,84,0.06);
+  border-left-color: #D95454;
+}
+.bm-recs__item--medium {
+  background: rgba(184,116,44,0.06);
+  border-left-color: #B8742C;
+}
+.bm-recs__item--low {
+  background: rgba(15,31,23,0.03);
+  border-left-color: rgba(15,31,23,0.15);
+}
+
+/* "중요" 등 우선순위 pill */
+.bm-recs__priority {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: none;
+  line-height: 1.4;
+}
+.bm-recs__priority--high {
+  background: #D95454;
+  color: #fff;
+}
+.bm-recs__priority--medium {
+  background: #B8742C;
+  color: #fff;
+}
+.bm-recs__priority--low {
+  background: rgba(15,31,23,0.08);
+  color: var(--text-2, #40342D);
+}
+
+.bm-recs__text {
+  font-size: 13px;
+  color: var(--text-2, #40342D);
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 빈 상태 */
+.bm-recs--empty {
+  padding: 32px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.bm-recs__empty-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: rgba(74,107,77,0.12);
+  color: #4A6B4D;
+}
+.bm-recs__empty-icon .bm-icon { width: 24px; height: 24px; }
+.bm-recs__empty-text {
+  font-size: 13px;
+  color: var(--text-3, #7A6A5F);
+  line-height: 1.5;
+}
+
