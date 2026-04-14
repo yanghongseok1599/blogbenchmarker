@@ -20,11 +20,11 @@
 /* ---------- 1. 디자인 토큰 ------------------------------------------------ */
 
 :root {
-  /* ─ 배경 메쉬 (파스텔 소프트) ─ */
-  --bg-stop-1: #E8EDF5;
-  --bg-stop-2: #F3EEF7;
-  --bg-stop-3: #EAF2F0;
-  --bg-solid:  #F0EEF5; /* backdrop-filter 미지원 환경의 단일 폴백 */
+  /* ─ 배경 메쉬 (그린 대시보드 — 민트 소프트) ─ */
+  --bg-stop-1: #D5E5DA;
+  --bg-stop-2: #EAF1EA;
+  --bg-stop-3: #DFEAE1;
+  --bg-solid:  #DFEAE1; /* backdrop-filter 미지원 환경의 단일 폴백 */
 
   /* ─ 글래스 표면 (light) ─ */
   --glass-1:       rgba(255, 255, 255, 0.58);   /* 카드 기본 */
@@ -41,16 +41,20 @@
   --text-3: #6A6D85;
   --text-4: #9093A8;
 
-  /* ─ 강조 / 상태 ─ */
-  --accent:        #5356F5;      /* primary (인디고 톤) */
-  --accent-2:      #8B6DF6;      /* gradient pair */
-  --accent-glow:   rgba(83, 86, 245, 0.35);
-  --good:          #1F8A59;
-  --good-bg:       rgba(31, 138, 89, 0.12);
-  --warn:          #B06214;
-  --warn-bg:       rgba(176, 98, 20, 0.14);
-  --poor:          #B4353C;
-  --poor-bg:       rgba(180, 53, 60, 0.14);
+  /* ─ 강조 / 상태 (그린 대시보드) ─ */
+  --accent:        #2F5F4A;      /* primary (딥 그린, 헤더/버튼) */
+  --accent-2:      #3D7B5E;      /* hover / gradient pair */
+  --accent-soft:   #5FA780;      /* 옅은 그린 (강조 요소) */
+  --accent-bg:     #DFEAE1;      /* 그린 배경 tint */
+  --accent-bg-2:   #EEF4F0;      /* 더 옅은 tint */
+  --accent-glow:   rgba(47, 95, 74, 0.28);
+  --good:          #3D7B5E;
+  --good-bg:       rgba(61, 123, 94, 0.14);
+  --warn:          #C77E2A;
+  --warn-bg:       rgba(199, 126, 42, 0.14);
+  --poor:          #C24A4A;
+  --poor-bg:       rgba(194, 74, 74, 0.14);
+  --on-accent:     #FFFFFF;
 
   /* ─ 그림자 (다층 미묘) ─ */
   --shadow-glass: 0 1px 0 rgba(255,255,255,0.55) inset,
@@ -62,8 +66,8 @@
   --shadow-btn:   0 1px 0 rgba(255,255,255,0.32) inset,
                   0 4px 14px rgba(15, 15, 30, 0.08);
   --shadow-btn-primary: 0 1px 0 rgba(255,255,255,0.22) inset,
-                        0 8px 24px rgba(83, 86, 245, 0.38),
-                        0 2px 6px rgba(83, 86, 245, 0.22);
+                        0 8px 24px rgba(47, 95, 74, 0.35),
+                        0 2px 6px rgba(47, 95, 74, 0.20);
 
   /* ─ 라운드 ─ */
   --r-card:  16px;
@@ -752,25 +756,26 @@ em, i, cite, address, dfn, var { font-style: normal; }
 .bm-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bm-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
-/* Primary — dark glass + 미묘한 글로우 */
+/* Primary — 그린 대시보드 */
 .bm-btn--primary {
-  background: linear-gradient(135deg, #17182A 0%, #1F2042 100%);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, var(--accent, #2F5F4A) 0%, var(--accent-2, #3D7B5E) 100%);
+  color: var(--on-accent, #fff);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: var(--shadow-btn-primary);
 }
 .bm-btn--primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #202139 0%, #29294F 100%);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, #3D7B5E 0%, #4F9470 100%);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
 }
 @media (prefers-color-scheme: dark) {
   .bm-btn--primary {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-    color: #0A0B14;
+    background: linear-gradient(135deg, #5FA780 0%, #7EC09D 100%);
+    color: #0F1F17;
     border-color: rgba(255, 255, 255, 0.2);
   }
   .bm-btn--primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #9B9EFF 0%, #C2ADFF 100%);
+    background: linear-gradient(135deg, #7EC09D 0%, #A8D4BC 100%);
   }
 }
 
@@ -902,6 +907,273 @@ em, i, cite, address, dfn, var { font-style: normal; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background: var(--glass-border-strong); border-radius: var(--r-pill); }
 *::-webkit-scrollbar-thumb:hover { background: var(--text-4); }
+
+/* ========================================================================
+ * --- 21-extra. AI 글 생성 폼 (.bm-generate) — 그린 대시보드 폼 ---------
+ * ======================================================================== */
+
+.bm-generate {
+  background: var(--glass-1, rgba(255,255,255,0.72));
+  backdrop-filter: var(--blur, blur(22px) saturate(180%));
+  -webkit-backdrop-filter: var(--blur, blur(22px) saturate(180%));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.5));
+  border-radius: var(--r-card, 16px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: var(--shadow-glass);
+}
+@supports not (backdrop-filter: blur(10px)) {
+  .bm-generate { background: var(--glass-1-solid, #fff); }
+}
+
+.bm-generate__head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(15,31,23,0.08);
+}
+.bm-generate__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text, #141628);
+  letter-spacing: -0.015em;
+  margin: 0;
+  line-height: 1.3;
+}
+.bm-generate__hint {
+  font-size: 13px;
+  color: var(--text-3, #6A6D85);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 폼 레이아웃 — 필드 세로 스택 */
+.bm-generate__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 각 필드: label 블록 */
+.bm-generate__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 필드 라벨 */
+.bm-generate__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2, #3B3D52);
+  letter-spacing: 0.005em;
+}
+
+/* 슬라이더 아래 보조 힌트 — 인라인 제거, 블록 이동 */
+.bm-generate__hint-inline {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-4, #9093A8);
+  margin-top: 2px;
+}
+
+/* 체크박스 라벨 — 별도 라인 */
+.bm-generate__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--accent-bg-2, #EEF4F0);
+  border: 1px solid rgba(47,95,74,0.14);
+  border-radius: var(--r-ctrl, 10px);
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease;
+  font-size: 13px;
+  color: var(--text-2, #3B3D52);
+  user-select: none;
+}
+.bm-generate__checkbox:hover {
+  background: var(--accent-bg, #DFEAE1);
+  border-color: rgba(47,95,74,0.28);
+}
+.bm-generate__checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(47,95,74,0.4);
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.bm-generate__checkbox input[type="checkbox"]:checked {
+  background: var(--accent, #2F5F4A);
+  border-color: var(--accent, #2F5F4A);
+}
+.bm-generate__checkbox input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background: transparent;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  border-right: 0;
+  border-top: 0;
+  transform: rotate(-45deg);
+  width: 10px;
+  height: 5px;
+  top: 4px;
+  left: 3px;
+}
+
+/* 입력 (text / textarea) */
+.bm-input, .bm-textarea {
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--text, #141628);
+  background: #fff;
+  border: 1px solid rgba(15,31,23,0.1);
+  border-radius: var(--r-ctrl, 10px);
+  padding: 11px 14px;
+  width: 100%;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+  line-height: 1.5;
+}
+.bm-input:focus, .bm-textarea:focus {
+  outline: none;
+  border-color: var(--accent, #2F5F4A);
+  box-shadow: 0 0 0 3px rgba(47,95,74,0.14);
+}
+.bm-input::placeholder, .bm-textarea::placeholder {
+  color: var(--text-4, #9093A8);
+}
+.bm-textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+/* Select (분량) */
+.bm-select {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text, #141628);
+  background: #fff;
+  border: 1px solid rgba(15,31,23,0.1);
+  border-radius: var(--r-ctrl, 10px);
+  padding: 11px 40px 11px 14px;
+  width: 100%;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'><path d='M3.5 5.25L7 8.75L10.5 5.25' stroke='%232F5F4A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+.bm-select:focus {
+  outline: none;
+  border-color: var(--accent, #2F5F4A);
+  box-shadow: 0 0 0 3px rgba(47,95,74,0.14);
+}
+
+/* Range (슬라이더) — 그린 테마 */
+.bm-range {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: rgba(47,95,74,0.12);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  border: 0;
+}
+.bm-range::-webkit-slider-runnable-track {
+  height: 6px;
+  background: rgba(47,95,74,0.12);
+  border-radius: 999px;
+}
+.bm-range::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent, #2F5F4A);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -7px;
+  box-shadow: 0 3px 10px rgba(47,95,74,0.4), 0 1px 3px rgba(47,95,74,0.2);
+  transition: transform 140ms ease;
+}
+.bm-range::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+.bm-range::-moz-range-track {
+  height: 6px;
+  background: rgba(47,95,74,0.12);
+  border-radius: 999px;
+}
+.bm-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--accent, #2F5F4A);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(47,95,74,0.4);
+}
+
+/* 제출 버튼 — 큰 그린 pill */
+.bm-generate__form .bm-btn--primary,
+.bm-generate__form button[data-action="generate-submit"] {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: var(--r-ctrl, 10px);
+  background: var(--accent, #2F5F4A);
+  color: var(--on-accent, #fff);
+  border: 0;
+  box-shadow: var(--shadow-btn-primary);
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+.bm-generate__form .bm-btn--primary:hover:not(:disabled),
+.bm-generate__form button[data-action="generate-submit"]:hover:not(:disabled) {
+  background: var(--accent-2, #3D7B5E);
+  transform: translateY(-1px);
+}
+.bm-generate__form .bm-btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Status / Result */
+.bm-generate__status {
+  padding: 12px 16px;
+  background: var(--accent-bg-2, #EEF4F0);
+  border: 1px solid rgba(47,95,74,0.14);
+  border-radius: var(--r-ctrl, 10px);
+  font-size: 13px;
+  color: var(--accent, #2F5F4A);
+}
+.bm-generate__status[data-state="error"] {
+  background: var(--poor-bg);
+  border-color: rgba(194,74,74,0.3);
+  color: var(--poor, #C24A4A);
+}
+.bm-generate__result { display: contents; }
+
 
 /* ========================================================================
  * --- 22. Recommendations list (.bm-recs) — 가독성 대폭 개선 --------------
