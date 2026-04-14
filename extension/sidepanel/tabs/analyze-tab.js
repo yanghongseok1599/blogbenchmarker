@@ -399,20 +399,44 @@ function renderDashboard(data) {
 }
 
 function buildHero(safe) {
-  const gauge = createTotalScoreGauge(safe.totalScore, {
-    label: '총점',
-    subtitle: '블로그 SEO',
-  })
+  // Editorial typographic summary — 원형 게이지 대신 큰 세리프 숫자.
+  const scoreValue = createEl(
+    'strong',
+    { className: 'bm-analyze__total-value' },
+    [String(Math.round(safe.totalScore || 0))],
+  )
+  const scoreLabel = createEl(
+    'span',
+    { className: 'bm-analyze__total-label' },
+    ['Total Score / 100'],
+  )
+  const totalBlock = createEl(
+    'div',
+    { className: 'bm-analyze__total' },
+    [scoreValue, scoreLabel],
+  )
 
-  const postTitle = createEl('p', { className: 'bm-analyze__post-title' }, [safe.title])
+  const postTitle = createEl(
+    'p',
+    { className: 'bm-analyze__post-title' },
+    [safe.title || '(제목 없음)'],
+  )
   const postUrl = createEl(
     'p',
     { className: 'bm-analyze__post-url', title: safe.url },
-    [safe.url || '(URL 없음)'],
+    [safe.url || ''],
   )
-  const meta = createEl('div', { className: 'bm-analyze__hero-meta' }, [postTitle, postUrl])
+  const postBlock = createEl(
+    'div',
+    { className: 'bm-analyze__post' },
+    [postTitle, postUrl],
+  )
 
-  return createEl('section', { className: 'bm-analyze__hero' }, [gauge, meta])
+  return createEl(
+    'section',
+    { className: 'bm-analyze__summary bm-analyze__hero' },
+    [totalBlock, postBlock],
+  )
 }
 
 function buildWarningsBanner(warnings) {
