@@ -18,6 +18,7 @@
 // 스타일: panel.css 의 카드/리스트 클래스 재사용.
 
 import { createEl, safeText } from '../../lib/dom-safe.js'
+import { icon } from './icons.js'
 
 /**
  * @param {object} structure - analyzeStructure 결과
@@ -172,13 +173,14 @@ function createChecklist(safe) {
 }
 
 function checkItem({ label, detail, ok, hint }) {
-  const icon = createEl(
+  // 체크/경고 마커는 icons.js 의 SVG(check/warning) — 색상은 .is-ok / .is-warn 변형 클래스가 제어.
+  const mark = createEl(
     'span',
     { className: `bm-structure-checklist__icon ${ok ? 'is-ok' : 'is-warn'}`, 'aria-hidden': 'true' },
-    [ok ? '✓' : '!'],
+    [icon(ok ? 'check' : 'warning', { size: 14, className: 'bm-icon' })],
   )
   const left = createEl('div', { className: 'bm-structure-checklist__left' }, [
-    icon,
+    mark,
     createEl('span', { className: 'bm-structure-checklist__label' }, [label]),
   ])
   const right = createEl('span', { className: 'bm-structure-checklist__detail' }, [detail])
@@ -216,9 +218,16 @@ function createTableOfContents(safe) {
     const heading = createEl('span', { className: 'bm-structure-toc__heading' }, [
       trim(s.heading || '(제목 없음)', 48),
     ])
-    const meta = createEl('span', { className: 'bm-structure-toc__meta' }, [
-      `${s.charCount}자${s.imageCount ? ` · 🖼 ${s.imageCount}` : ''}`,
-    ])
+    // 이미지 카운트는 icon('image') + 숫자 조합으로 렌더 (이모지 미사용).
+    const metaChildren = [`${s.charCount}자`]
+    if (s.imageCount) {
+      metaChildren.push(
+        ' · ',
+        icon('image', { size: 12, className: 'bm-icon bm-icon--inline' }),
+        ` ${s.imageCount}`,
+      )
+    }
+    const meta = createEl('span', { className: 'bm-structure-toc__meta' }, metaChildren)
     const statusCls = sectionStatus(s)
     return createEl(
       'li',

@@ -7,11 +7,13 @@
 //   - 섹션 (헤더 마커로 구분된 본문 블록)
 //   - 마무리 (마지막 섹션 이후 남는 문단)
 //
-// 섹션 헤더 판정 기준 (휴리스틱):
-//   1) 마커 시작: ▶ ▷ ■ □ ◆ ◇ ● ○ ▪ ▫ ※ ★ ✅ ※
-//   2) 숫자 리스트: "1." "1)" "STEP 1" "STEP1"
-//   3) H-marker: "##", "###" (마크다운 대비)
-//   4) 굵은/짧은 단독 줄: 20자 이하 + 앞뒤 줄 비어있음 (약한 신호)
+// 섹션 헤더 판정 기준 (강한 신호만):
+//   1) 마커 시작: ▶ ▷ ■ □ ◆ ◇ ● ○ ▪ ▫ ※ ★ ✅
+//   2) 숫자 + 제목: "1. 제목" "1) 제목" (숫자 뒤 반드시 본문 텍스트)
+//   3) STEP: "STEP 1 제목"
+//   4) 마크다운 H: "## 제목" "### 제목"
+// ⚠️ "짧은 단독 줄" 휴리스틱은 제거 — SmartEditor 의 짤막한 연속 단락을
+//    섹션 헤더로 오인식하는 문제가 있었음.
 //
 // 이상 구조(한국 SEO 기준):
 //   - 제목: 25~60자
@@ -29,6 +31,14 @@ const MARKER_RE = new RegExp(`^\\s*[${MARKER_CHARS}]\\s*(.{2,80}?)\\s*$`)
 const NUMBERED_RE = /^\s*(\d{1,2})[.)]\s+(.{2,80}?)\s*$/
 const STEP_RE = /^\s*(STEP|Step|step)\s*(\d{1,2})[.:\s]+(.{2,80}?)\s*$/
 const HASH_RE = /^\s*(#{2,4})\s+(.{2,80}?)\s*$/
+
+// Sanity 임계값.
+// - NUMBERED_LIST_THRESHOLD: 숫자 헤더가 이 개수 이상이면 "리스트" 로 보고 헤더 아님으로 강등
+// - MIN_SECTION_BODY_CHARS : 헤더 다음 본문이 이 미만이면 실질 섹션 아님 — 헤더 무시
+// - MAX_REAL_SECTIONS      : 필터링 후 섹션 수가 이 초과면 리스트 오탐으로 간주 — sections 비움
+const NUMBERED_LIST_THRESHOLD = 7
+const MIN_SECTION_BODY_CHARS = 30
+const MAX_REAL_SECTIONS = 20
 
 const IDEAL = Object.freeze({
   TITLE_MIN: 25,
@@ -63,7 +73,7 @@ export function analyzeStructure({ title = '', content = '', images = [] } = {})
 
   const lines = splitLines(safeContent)
   const headerIndices = detectHeaders(lines)
-  const { intro, sections, outro } = groupBySections(lines, headerIndices)
+  const { intro, sections, outro, falsePositive } = groupBySections(lines, headerIndices)
 
   // 각 섹션에 이미지 근사 분배 (총 이미지 / 섹션 수, 소수점 버림 + 우선순위)
   distributeImages(sections, imageCount)
@@ -83,6 +93,7 @@ export function analyzeStructure({ title = '', content = '', images = [] } = {})
     outro,
     imageCount,
     score,
+    falsePositive,
   })
 
   return {
@@ -90,6 +101,7 @@ export function analyzeStructure({ title = '', content = '', images = [] } = {})
     intro,
     sections,
     outro,
+    falsePositive: !!falsePositive,
     totals: {
       sectionCount: sections.length,
       imageCount,
@@ -126,9 +138,9 @@ function detectHeaders(lines) {
   lines.forEach((line, i) => {
     if (line.length > 120) return // 너무 긴 줄은 헤더 아님
 
-    // 1) 마커 시작
+    // 1) 마커 시작 (▶ ■ 등) — 헤딩 텍스트 최소 2자
     const m1 = line.match(MARKER_RE)
-    if (m1) {
+    if (m1 && m1[1].trim().length >= 2) {
       headers.push({
         index: i,
         heading: m1[1].trim(),
@@ -138,9 +150,9 @@ function detectHeaders(lines) {
       return
     }
 
-    // 2) 숫자 리스트
+    // 2) 숫자 + 제목 (헤딩 텍스트 최소 2자, 전체 80자 이하)
     const m2 = line.match(NUMBERED_RE)
-    if (m2 && line.length <= 80) {
+    if (m2 && m2[2].trim().length >= 2 && line.length <= 80) {
       headers.push({
         index: i,
         heading: m2[2].trim(),
@@ -152,7 +164,7 @@ function detectHeaders(lines) {
 
     // 3) STEP
     const m3 = line.match(STEP_RE)
-    if (m3) {
+    if (m3 && m3[3].trim().length >= 2) {
       headers.push({
         index: i,
         heading: m3[3].trim(),
@@ -164,7 +176,7 @@ function detectHeaders(lines) {
 
     // 4) Markdown H
     const m4 = line.match(HASH_RE)
-    if (m4) {
+    if (m4 && m4[2].trim().length >= 2) {
       headers.push({
         index: i,
         heading: m4[2].trim(),
@@ -173,14 +185,16 @@ function detectHeaders(lines) {
       })
       return
     }
-
-    // 5) 약한 신호: 짧고 독립적인 줄 (20자 이하) + 앞/뒤 빈 줄 (혹은 경계)
-    //    lines 배열은 빈 줄 제거 후이므로 "앞뒤 짧은 줄"은 체크 불가.
-    //    대신 짧은 단일 줄이고 문장부호 없음으로 판정.
-    if (line.length <= 20 && !/[.!?。？！]$/.test(line)) {
-      headers.push({ index: i, heading: line, type: 'short' })
-    }
+    // 약한 신호(짧은 줄 = 헤더) 휴리스틱 삭제. 헤더 없음으로 판정.
   })
+
+  // Sanity: "1. ... 2. ... 3. ..." 식 숫자 목록은 섹션 헤더가 아니라 리스트.
+  // NUMBERED_RE 가 일반 숫자 목록도 잡으므로, 숫자 헤더가 과하게 많으면 전부 강등.
+  // (섹션 헤더가 7개 이상인 정상 글은 매우 드물다 — IDEAL.SECTION_COUNT_MAX=6)
+  const numberedCount = headers.filter((h) => h.type === 'numbered').length
+  if (numberedCount >= NUMBERED_LIST_THRESHOLD) {
+    return headers.filter((h) => h.type !== 'numbered')
+  }
   return headers
 }
 
@@ -196,15 +210,28 @@ function groupBySections(lines, headers) {
   // 약한 신호(short) 만 있는 경우는 헤더로 쳐주지 않는 편이 안전 (시 인용 등 오인식).
   // 하지만 강한 신호(marker/numbered/step/hash)가 하나라도 있으면 그것만 사용.
   const strong = headers.filter((h) => h.type !== 'short')
-  const used = strong.length > 0 ? strong : headers
+  let used = strong.length > 0 ? strong : headers
+
+  // Sanity 1: 헤더 사이 본문이 MIN_SECTION_BODY_CHARS 미만이면 실질 섹션이 아니다 →
+  //           해당 헤더 무시. (예: 한 줄짜리 인용 뒤에 바로 다음 헤더)
+  const filteredByBody = []
+  for (let i = 0; i < used.length; i++) {
+    const cur = used[i]
+    const next = used[i + 1]
+    const endIdx = next ? next.index : lines.length
+    const bodyLines = lines.slice(cur.index + 1, endIdx)
+    const bodyChars = bodyLines.join('').length
+    if (bodyChars >= MIN_SECTION_BODY_CHARS) filteredByBody.push(cur)
+  }
+  used = filteredByBody
 
   if (used.length === 0) {
     // 섹션 없음 → 전체가 intro
-    const joined = lines.join('\n')
     return {
       intro: buildBlock('intro', '도입부', lines),
       sections: [],
       outro: null,
+      falsePositive: false,
     }
   }
 
@@ -235,6 +262,17 @@ function groupBySections(lines, headers) {
     })
   }
 
+  // Sanity 2: body 필터 후에도 섹션이 20개 초과면 숫자 리스트 오탐으로 판정.
+  //           → sections 를 비우고 recommendations 에 불명확성 안내 (호출부에서 처리).
+  if (sections.length > MAX_REAL_SECTIONS) {
+    return {
+      intro: buildBlock('intro', '도입부', lines),
+      sections: [],
+      outro: null,
+      falsePositive: true,
+    }
+  }
+
   // 마지막 섹션이 너무 짧고(예: 40자 이하) 전체의 끝에 위치하면 outro 로 승격
   let outro = null
   const last = sections[sections.length - 1]
@@ -248,7 +286,7 @@ function groupBySections(lines, headers) {
     sections.pop()
   }
 
-  return { intro, sections, outro }
+  return { intro, sections, outro, falsePositive: false }
 }
 
 function buildBlock(key, label, lines) {
@@ -361,8 +399,17 @@ function scoreImageDistribution(sections, imageCount) {
 // 추천사항
 // ─────────────────────────────────────────────────────────────
 
-function buildRecommendations({ title, intro, sections, outro, imageCount, score }) {
+function buildRecommendations({ title, intro, sections, outro, imageCount, score, falsePositive }) {
   const recs = []
+
+  // Sanity: 숫자 리스트 등의 오탐으로 섹션 탐지를 포기한 경우 최상단에 안내.
+  if (falsePositive) {
+    recs.push(rec(
+      'medium',
+      'section',
+      '목록이 많아 섹션 구분이 불명확합니다. 숫자 목록 대신 ▶ 또는 ## 마커로 섹션을 구분하세요.',
+    ))
+  }
 
   // 제목
   if (title.length === 0) {

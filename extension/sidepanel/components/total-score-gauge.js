@@ -93,12 +93,13 @@ export function createTotalScoreGauge(rawScore, options = {}) {
   return createEl(
     'section',
     {
-      className: `bm-gauge bm-gauge--${colorKey}`,
+      className: `bm-gauge bm-gauge--glass bm-gauge--${colorKey}`,
       role: 'group',
       'aria-label': `${label} ${Math.round(score)}점, 등급 ${grade}`,
       'data-score': String(Math.round(score)),
       'data-grade': grade,
       'data-circumference': String(geom.circumference),
+      'data-variant': 'glass',
     },
     [head, subtitleEl],
   )
@@ -118,7 +119,7 @@ export function updateTotalScoreGauge(gaugeRoot, nextScore) {
 
   gaugeRoot.setAttribute('data-score', String(Math.round(score)))
   gaugeRoot.setAttribute('data-grade', grade)
-  gaugeRoot.className = `bm-gauge bm-gauge--${colorKey}`
+  gaugeRoot.className = `bm-gauge bm-gauge--glass bm-gauge--${colorKey}`
   gaugeRoot.setAttribute('aria-label', `총점 ${Math.round(score)}점, 등급 ${grade}`)
 
   // 원형 진행 offset 업데이트

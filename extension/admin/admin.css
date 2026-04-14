@@ -1,91 +1,122 @@
-/* extension/admin/admin.css — Phase 11 관리자 페이지 스타일
+/* extension/admin/admin.css
  *
- * 레이아웃: 어두운 상단 바 + 중앙 정렬 메인 영역 + 탭 네비 + 테이블.
- * 관리자 모드임을 시각적으로 구분하기 위해 헤더에 darker theme 사용.
- * Tailwind 금지. 토큰은 auth.css / mypage.css / panel.css 와 동일.
+ * 관리자 페이지 — 독립 HTML. Glass + darker mesh (관리자 모드 구분).
+ * Tailwind 금지. Pretendard · No Italic. No emoji.
  */
 
 :root {
-  /* Color */
-  --bm-primary:        #2563eb;
-  --bm-primary-hover:  #1d4ed8;
-  --bm-primary-soft:   #eff6ff;
-  --bm-primary-ring:   rgba(37, 99, 235, 0.2);
-  --bm-accent:         #7c3aed;
+  /* mesh는 관리자 모드 표시를 위해 약간 더 짙고 중성적 */
+  --bg-mesh:
+    radial-gradient(at 12% 0%, hsla(220, 35%, 35%, 0.22), transparent 50%),
+    radial-gradient(at 92% 8%, hsla(260, 25%, 30%, 0.16), transparent 55%),
+    radial-gradient(at 50% 100%, hsla(210, 30%, 32%, 0.14), transparent 55%),
+    #eef0f4;
 
-  --bm-bg:             #f7f8fa;
-  --bm-surface:        #ffffff;
-  --bm-surface-alt:    #f1f5f9;
+  --glass-bg:        rgba(255, 255, 255, 0.58);
+  --glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --glass-border:    rgba(255, 255, 255, 0.35);
+  --glass-border-strong: rgba(255, 255, 255, 0.55);
+  --glass-shadow:    0 10px 40px rgba(15, 15, 30, 0.08);
+  --glass-shadow-lg: 0 20px 60px rgba(15, 15, 30, 0.12);
 
-  --bm-text:           #0f172a;
-  --bm-text-muted:     #475569;
-  --bm-text-subtle:    #64748b;
-  --bm-text-faint:     #94a3b8;
+  --text-primary:    #1a1a1d;
+  --text-secondary:  #525256;
+  --text-tertiary:   #8a8a8d;
 
-  --bm-border:         #e2e8f0;
-  --bm-border-strong:  #cbd5e1;
+  --brand:           #2563eb;
+  --brand-hover:     #1d4ed8;
+  --brand-soft:      rgba(37, 99, 235, 0.12);
+  --brand-ring:      rgba(37, 99, 235, 0.25);
+  --accent:          #7c3aed;
 
-  --bm-success:        #16a34a;
-  --bm-success-bg:     #ecfdf5;
-  --bm-success-fg:     #047857;
-  --bm-warn:           #d97706;
-  --bm-danger:         #dc2626;
-  --bm-danger-bg:      #fef2f2;
-  --bm-danger-fg:      #b91c1c;
-  --bm-danger-border:  #fecaca;
+  --success:         #16a34a;
+  --success-soft:    rgba(22, 163, 74, 0.10);
+  --warn:            #d97706;
+  --danger:          #dc2626;
+  --danger-soft:     rgba(220, 38, 38, 0.10);
 
-  /* Admin 전용 — 어두운 탑바 */
-  --bm-admin-header-bg: #0f172a;
-  --bm-admin-header-fg: #ffffff;
-  --bm-admin-header-meta: #cbd5e1;
+  /* 관리자 헤더는 짙은 색 */
+  --admin-header-bg: rgba(15, 23, 42, 0.92);
+  --admin-header-fg: #ffffff;
+  --admin-header-meta: #cbd5e1;
+  --admin-indicator: #ef4444;
 
-  /* Shape + Shadow */
-  --bm-radius:         8px;
-  --bm-radius-card:    12px;
-  --bm-radius-pill:    999px;
-  --bm-shadow-sm:      0 1px 2px rgba(15, 23, 42, 0.04);
-  --bm-shadow-md:      0 4px 16px rgba(15, 23, 42, 0.08);
+  --radius-sm:       8px;
+  --radius-card:     16px;
+  --radius-pill:     999px;
+  --blur:            22px;
 
-  /* Spacing */
-  --bm-space-xs:       8px;
-  --bm-space-sm:       12px;
-  --bm-space-md:       16px;
-  --bm-space-lg:       24px;
-  --bm-space-xl:       32px;
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
 
-  --bm-font: "Pretendard Variable", "Pretendard",
-             -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
-             "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
-  --bm-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font: "Pretendard Variable", "Pretendard",
+          "Apple SD Gothic Neo", "Noto Sans KR",
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --dur: 160ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-mesh:
+      radial-gradient(at 12% 0%, hsla(220, 40%, 22%, 0.32), transparent 50%),
+      radial-gradient(at 92% 8%, hsla(260, 30%, 20%, 0.22), transparent 55%),
+      radial-gradient(at 50% 100%, hsla(210, 35%, 18%, 0.18), transparent 55%),
+      #0b0b0e;
+    --glass-bg:        rgba(22, 22, 28, 0.55);
+    --glass-bg-strong: rgba(28, 28, 34, 0.72);
+    --glass-border:    rgba(255, 255, 255, 0.08);
+    --glass-border-strong: rgba(255, 255, 255, 0.14);
+    --glass-shadow:    0 10px 40px rgba(0, 0, 0, 0.5);
+    --glass-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+    --text-primary:    #f4f4f5;
+    --text-secondary:  #a1a1aa;
+    --text-tertiary:   #71717a;
+    --brand:           #60a5fa;
+    --brand-hover:     #93c5fd;
+    --brand-soft:      rgba(96, 165, 250, 0.15);
+    --brand-ring:      rgba(96, 165, 250, 0.3);
+    --accent:          #c084fc;
+    --admin-header-bg: rgba(0, 0, 0, 0.88);
+    --admin-indicator: #f87171;
+  }
 }
 
 * { box-sizing: border-box; }
+*, em, i, cite, address, dfn, var { font-style: normal !important; }
 
 html, body {
   margin: 0;
   padding: 0;
-  font-family: var(--bm-font);
-  background: var(--bm-bg);
-  color: var(--bm-text);
+  font-family: var(--font);
+  background: var(--bg-mesh);
+  background-attachment: fixed;
+  color: var(--text-primary);
   font-size: 13px;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ────────────────────────────────────────────────────────
- * 헤더 — 관리자 모드 darker theme
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 헤더 — 관리자 darker glass ─── */
 .ad-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px var(--bm-space-lg);
-  background: var(--bm-admin-header-bg);
-  color: var(--bm-admin-header-fg);
-  border-bottom: 1px solid #1e293b;
+  padding: 14px var(--sp-5);
+  background: var(--admin-header-bg);
+  backdrop-filter: blur(var(--blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(160%);
+  color: var(--admin-header-fg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ad-header { background: #0f172a; }
 }
 
 .ad-title {
@@ -95,252 +126,251 @@ html, body {
   letter-spacing: 0.02em;
   display: flex;
   align-items: center;
-  gap: var(--bm-space-xs);
+  gap: var(--sp-2);
 }
 
-/* 관리자 모드 표시자 — 빨간 점 + "관리자" 아이콘 배지 */
+/* 관리자 모드 빨간 점 표시 */
 .ad-title::before {
   content: "";
   width: 8px;
   height: 8px;
-  border-radius: var(--bm-radius-pill);
-  background: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-pill);
+  background: var(--admin-indicator);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25),
+              0 0 12px rgba(239, 68, 68, 0.5);
   display: inline-block;
+  animation: adPulse 2s var(--ease) infinite;
 }
 
-.ad-header__meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+@keyframes adPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25),
+                         0 0 12px rgba(239, 68, 68, 0.5); }
+  50%      { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.12),
+                         0 0 18px rgba(239, 68, 68, 0.7); }
 }
 
-.ad-header__email {
-  font-size: 12px;
-  color: var(--bm-admin-header-meta);
-  font-family: var(--bm-mono);
-}
+.ad-header__meta { display: flex; align-items: center; gap: 10px; }
+.ad-header__email { font-size: 12px; color: var(--admin-header-meta); font-family: var(--font-mono); }
 
-/* ────────────────────────────────────────────────────────
- * Gate — 권한 확인 중 / 거부 화면
- * ──────────────────────────────────────────────────────── */
+/* ─── Gate ─── */
+.ad-gate { padding: 80px var(--sp-5); text-align: center; }
+.ad-gate__msg { margin: 0; font-size: 14px; color: var(--text-secondary); }
+.ad-gate--error .ad-gate__msg { color: var(--danger); font-weight: 600; }
 
-.ad-gate {
-  padding: 80px var(--bm-space-lg);
-  text-align: center;
-}
-.ad-gate__msg {
-  margin: 0;
-  font-size: 14px;
-  color: var(--bm-text-muted);
-}
-.ad-gate--error .ad-gate__msg { color: var(--bm-danger-fg); font-weight: 600; }
+/* ─── 메인 ─── */
+.ad-main { padding: var(--sp-5); max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--sp-4); }
 
-/* ────────────────────────────────────────────────────────
- * 메인 래퍼
- * ──────────────────────────────────────────────────────── */
-
-.ad-main {
-  padding: var(--bm-space-lg);
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--bm-space-md);
-}
-
-/* ────────────────────────────────────────────────────────
- * 탭 네비 (사이드바-influenced top rail)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 탭 네비 (Glass) ─── */
 .ad-tabs {
   display: flex;
   gap: 4px;
   padding: 4px;
-  background: var(--bm-surface);
-  border: 1px solid var(--bm-border);
-  border-radius: var(--bm-radius-card);
-  box-shadow: var(--bm-shadow-sm);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glass-shadow);
 }
 
 .ad-tab {
-  padding: var(--bm-space-xs) var(--bm-space-md);
+  padding: var(--sp-2) var(--sp-4);
   border: 0;
   background: transparent;
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
-  color: var(--bm-text-subtle);
-  border-radius: var(--bm-radius);
-  transition: background 120ms ease, color 120ms ease;
+  color: var(--text-secondary);
+  border-radius: 10px;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.ad-tab:hover { color: var(--bm-text); background: var(--bm-surface-alt); }
+.ad-tab:hover {
+  color: var(--text-primary);
+  background: var(--glass-bg-strong);
+}
 .ad-tab.is-active {
-  color: var(--bm-admin-header-fg);
-  background: var(--bm-admin-header-bg);
+  color: #ffffff;
+  background: var(--text-primary);
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(26, 26, 29, 0.22);
 }
-.ad-tab:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--bm-primary-ring);
-}
+.ad-tab:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-ring); }
 
 .ad-panel[hidden] { display: none; }
 
-/* ────────────────────────────────────────────────────────
- * 툴바 (검색 + 액션)
- * ──────────────────────────────────────────────────────── */
+/* ─── 툴바 ─── */
+.ad-toolbar { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.ad-toolbar__count { margin-left: auto; font-size: 12px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
 
-.ad-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--bm-space-xs);
-  flex-wrap: wrap;
-}
-
-.ad-toolbar__count {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--bm-text-subtle);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ────────────────────────────────────────────────────────
- * 버튼 (액션)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 버튼 ─── */
 .ad-btn {
-  padding: 6px 12px;
-  border: 1px solid var(--bm-border-strong);
-  background: var(--bm-surface);
-  color: var(--bm-text);
-  border-radius: var(--bm-radius);
+  padding: 7px 12px;
+  border: 1px solid var(--glass-border-strong);
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+  transition: background var(--dur) var(--ease),
+              border-color var(--dur) var(--ease),
+              transform 80ms var(--ease);
 }
-.ad-btn:hover:not(:disabled) { background: var(--bm-surface-alt); border-color: var(--bm-text-subtle); }
+.ad-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(26, 26, 29, 0.15);
+}
+@media (prefers-color-scheme: dark) {
+  .ad-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
 .ad-btn:active:not(:disabled) { transform: translateY(1px); }
 .ad-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.ad-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--bm-primary-ring); }
+.ad-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-ring); }
 
 .ad-btn--primary {
-  background: var(--bm-admin-header-bg);
+  background: var(--text-primary);
   color: #ffffff;
-  border-color: var(--bm-admin-header-bg);
+  border-color: var(--text-primary);
+  box-shadow: 0 4px 10px rgba(26, 26, 29, 0.2);
 }
 .ad-btn--primary:hover:not(:disabled) {
-  background: #1e293b;
-  border-color: #1e293b;
+  background: var(--text-secondary);
+  border-color: var(--text-secondary);
+  box-shadow: 0 6px 14px rgba(26, 26, 29, 0.28);
+}
+@media (prefers-color-scheme: dark) {
+  .ad-btn--primary {
+    background: #f4f4f5;
+    color: #1a1a1d;
+    border-color: #f4f4f5;
+  }
 }
 
 .ad-btn--danger {
-  background: var(--bm-surface);
-  color: var(--bm-danger-fg);
-  border-color: var(--bm-danger-border);
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: rgba(220, 38, 38, 0.3);
 }
 .ad-btn--danger:hover:not(:disabled) {
-  background: var(--bm-danger-bg);
-  border-color: var(--bm-danger);
+  background: rgba(220, 38, 38, 0.18);
+  border-color: var(--danger);
 }
 
-/* ────────────────────────────────────────────────────────
- * 입력
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 입력 (투명 배경 + glass border) ─── */
 .ad-input {
-  padding: 7px 10px;
-  border: 1px solid var(--bm-border-strong);
-  background: var(--bm-surface);
-  color: var(--bm-text);
-  border-radius: var(--bm-radius);
+  padding: 8px 10px;
+  border: 1px solid var(--glass-border-strong);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 12px;
   min-width: 220px;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: border-color var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease),
+              background var(--dur) var(--ease);
 }
-.ad-input::placeholder { color: var(--bm-text-faint); }
+@media (prefers-color-scheme: dark) {
+  .ad-input { background: rgba(255, 255, 255, 0.06); }
+}
+.ad-input::placeholder { color: var(--text-tertiary); }
 .ad-input:focus {
   outline: none;
-  border-color: var(--bm-primary);
-  box-shadow: 0 0 0 3px var(--bm-primary-ring);
+  border-color: var(--brand);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+@media (prefers-color-scheme: dark) {
+  .ad-input:focus { background: rgba(255, 255, 255, 0.1); }
 }
 
 .ad-input--text {
   width: 100%;
   min-width: 0;
   resize: vertical;
-  font-family: var(--bm-mono);
+  font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.5;
 }
 
-/* ────────────────────────────────────────────────────────
- * 상태 배너 (info/ok/error)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 상태 배너 ─── */
 .ad-status {
-  padding: var(--bm-space-xs) var(--bm-space-sm);
-  border-radius: var(--bm-radius);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
   font-size: 12px;
-  border: 1px solid transparent;
-  display: flex;
-  align-items: center;
-  gap: var(--bm-space-xs);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-.ad-status--info { background: var(--bm-primary-soft); color: #1e40af; border-color: #dbeafe; }
-.ad-status--error { background: var(--bm-danger-bg); color: var(--bm-danger-fg); border-color: var(--bm-danger-border); }
-.ad-status--ok { background: var(--bm-success-bg); color: var(--bm-success-fg); border-color: #a7f3d0; }
+.ad-status--info { background: var(--brand-soft); color: var(--brand); border-color: rgba(37,99,235,0.25); }
+.ad-status--error { background: var(--danger-soft); color: var(--danger); border-color: rgba(220,38,38,0.25); }
+.ad-status--ok { background: var(--success-soft); color: var(--success); border-color: rgba(22,163,74,0.25); }
 
-/* ────────────────────────────────────────────────────────
- * 테이블 (유저 / 설정 / 감사 공용 기반)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 테이블 (Glass card) ─── */
 .ad-table {
-  background: var(--bm-surface);
-  border: 1px solid var(--bm-border);
-  border-radius: var(--bm-radius-card);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glass-shadow);
   overflow: hidden;
-  box-shadow: var(--bm-shadow-sm);
+  position: relative;
+}
+
+.ad-table::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .ad-row {
   display: grid;
   grid-template-columns: 1.5fr 1fr 80px 80px 100px 240px;
-  gap: var(--bm-space-xs);
-  padding: 10px var(--bm-space-sm);
-  border-bottom: 1px solid var(--bm-surface-alt);
+  gap: var(--sp-2);
+  padding: 10px var(--sp-3);
+  border-bottom: 1px solid var(--glass-border);
   align-items: center;
   font-size: 12px;
-  transition: background 120ms ease;
+  transition: background var(--dur) var(--ease);
 }
 .ad-row:last-child { border-bottom: 0; }
-.ad-row:not(.ad-row--head):hover { background: var(--bm-surface-alt); }
+.ad-row:not(.ad-row--head):hover {
+  background: var(--glass-bg-strong);
+}
 
 .ad-row--head {
-  background: var(--bm-surface-alt);
+  background: var(--glass-bg-strong);
   font-weight: 700;
-  color: var(--bm-text-muted);
+  color: var(--text-secondary);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  border-bottom: 1px solid var(--bm-border);
+  border-bottom: 1px solid var(--glass-border-strong);
 }
-
 .ad-row--empty {
-  padding: var(--bm-space-lg);
+  padding: var(--sp-5);
   text-align: center;
-  color: var(--bm-text-faint);
+  color: var(--text-tertiary);
   grid-template-columns: 1fr;
 }
-
-.ad-cell {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.ad-cell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ad-cell--actions {
   display: flex;
   gap: 4px;
@@ -348,153 +378,102 @@ html, body {
   justify-content: flex-end;
 }
 
-/* ────────────────────────────────────────────────────────
- * Plan badge (유저 목록 / 설정 공용)
- * ──────────────────────────────────────────────────────── */
-
+/* Plan 배지 */
 .ad-plan {
   display: inline-block;
-  padding: 2px var(--bm-space-xs);
-  border-radius: var(--bm-radius-pill);
+  padding: 2px var(--sp-2);
+  border-radius: var(--radius-pill);
   font-size: 10px;
   font-weight: 700;
-  background: var(--bm-border);
-  color: var(--bm-text-muted);
+  background: var(--glass-bg-strong);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  border: 1px solid var(--glass-border-strong);
 }
-.ad-plan[data-plan="free"] { background: var(--bm-border); color: var(--bm-text-muted); }
-.ad-plan[data-plan="pro"] { background: var(--bm-primary); color: #ffffff; }
-.ad-plan[data-plan="unlimited"] {
-  background: linear-gradient(135deg, var(--bm-primary) 0%, var(--bm-accent) 100%);
-  color: #ffffff;
-}
+.ad-plan[data-plan="pro"] { background: var(--brand); color: #ffffff; border-color: transparent; }
+.ad-plan[data-plan="unlimited"] { background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%); color: #ffffff; border-color: transparent; }
 
-/* ────────────────────────────────────────────────────────
- * 테이블 — 설정 / 감사 전용 컬럼
- * ──────────────────────────────────────────────────────── */
-
+/* 전용 컬럼 */
 .ad-row--settings { grid-template-columns: 1fr 2fr 160px 100px; }
-
 .ad-row--audit { grid-template-columns: 160px 180px 240px 1fr; }
-
-.ad-cell--mono {
-  font-family: var(--bm-mono);
-  font-size: 11px;
+.ad-cell--mono { font-family: var(--font-mono); font-size: 11px; }
+.ad-cell--meta { white-space: pre-wrap; word-break: break-all; max-height: 80px; overflow: auto; background: rgba(0,0,0,0.04); padding: 6px var(--sp-2); border-radius: 4px; line-height: 1.4; }
+@media (prefers-color-scheme: dark) {
+  .ad-cell--meta { background: rgba(255, 255, 255, 0.04); }
 }
 
-.ad-cell--meta {
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 80px;
-  overflow: auto;
-  background: var(--bm-surface-alt);
-  padding: 6px var(--bm-space-xs);
-  border-radius: 4px;
-  line-height: 1.4;
-}
-
-/* ────────────────────────────────────────────────────────
- * 금칙어 칩 컨테이너
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 금칙어 (Glass) ─── */
 .ad-banwords {
   margin: 0;
-  padding: var(--bm-space-sm);
+  padding: var(--sp-3);
   list-style: none;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  background: var(--bm-surface);
-  border: 1px solid var(--bm-border);
-  border-radius: var(--bm-radius-card);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
   min-height: 72px;
-  box-shadow: var(--bm-shadow-sm);
+  box-shadow: var(--glass-shadow);
 }
 
-.ad-banword {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: #fee2e2;
-  color: #991b1b;
-  border-radius: var(--bm-radius-pill);
-  font-size: 12px;
-  font-weight: 500;
-}
-
+.ad-banword { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(220,38,38,0.25); border-radius: var(--radius-pill); font-size: 12px; font-weight: 500; }
 .ad-banword__remove {
   background: transparent;
   border: 0;
-  color: #991b1b;
+  color: inherit;
   cursor: pointer;
   font-size: 14px;
   padding: 0 0 0 4px;
   line-height: 1;
   font-family: inherit;
   opacity: 0.7;
-  transition: opacity 120ms ease, color 120ms ease;
+  transition: opacity var(--dur) var(--ease);
 }
-.ad-banword__remove:hover { opacity: 1; color: #7f1d1d; }
+.ad-banword__remove:hover { opacity: 1; }
+.ad-banwords__empty { color: var(--text-tertiary); font-size: 12px; margin: 0; padding: var(--sp-2); }
 
-.ad-banwords__empty {
-  color: var(--bm-text-faint);
-  font-size: 12px;
-  margin: 0;
-  padding: var(--bm-space-xs);
-}
-
-/* ────────────────────────────────────────────────────────
- * 상세 폼 (설정 편집 등)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 상세 폼 (Glass) ─── */
 .ad-details {
-  margin-top: var(--bm-space-sm);
-  background: var(--bm-surface);
-  border: 1px solid var(--bm-border);
-  border-radius: var(--bm-radius-card);
-  padding: var(--bm-space-sm) var(--bm-space-md);
-  box-shadow: var(--bm-shadow-sm);
+  margin-top: var(--sp-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  padding: var(--sp-3) var(--sp-4);
+  box-shadow: var(--glass-shadow);
 }
-
 .ad-details > summary {
   cursor: pointer;
   font-weight: 700;
-  color: var(--bm-text);
+  color: var(--text-primary);
   user-select: none;
   outline: none;
   padding: 4px 0;
 }
 .ad-details > summary:focus-visible {
-  box-shadow: 0 0 0 3px var(--bm-primary-ring);
+  box-shadow: 0 0 0 3px var(--brand-ring);
   border-radius: 4px;
 }
-
 .ad-form {
   display: flex;
   flex-direction: column;
-  gap: var(--bm-space-sm);
-  margin-top: var(--bm-space-sm);
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
 }
-.ad-form__row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--bm-text-muted);
-}
-.ad-form__row > span { font-weight: 600; color: var(--bm-text); }
+.ad-form__row { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+.ad-form__row > span { font-weight: 600; color: var(--text-primary); }
 
-/* ────────────────────────────────────────────────────────
- * 반응형
- * ──────────────────────────────────────────────────────── */
-
+/* 반응형 */
 @media (max-width: 900px) {
-  .ad-row { grid-template-columns: 1fr; gap: 4px; padding: var(--bm-space-sm); }
+  .ad-row { grid-template-columns: 1fr; gap: 4px; padding: var(--sp-3); }
   .ad-row--head { display: none; }
   .ad-cell--actions { justify-content: flex-start; }
   .ad-row--audit, .ad-row--settings { grid-template-columns: 1fr; }
-  .ad-main { padding: var(--bm-space-sm); }
+  .ad-main { padding: var(--sp-3); }
   .ad-input { min-width: 140px; flex: 1; }
 }

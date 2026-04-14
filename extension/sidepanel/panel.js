@@ -9,17 +9,18 @@
 
 import { createEl, safeText, clearAndAppend } from '../lib/dom-safe.js'
 import { getSession, onAuthChange } from '../lib/supabase-client.js'
+import { icon } from './components/icons.js'
 
 const APP_VERSION = '0.1.0'
 
-// 탭 식별자 → 메타(아이콘·라벨·활성화 함수)
+// 탭 식별자 → 메타. 아이콘은 HTML 의 data-icon 속성으로 선언하고 initTabIcons() 가 주입한다.
 const TAB_META = Object.freeze([
-  { id: 'analyze',   icon: '📊', labelKey: 'tab_analyze',   loader: () => import('./tabs/analyze-tab.js'),    mountName: 'mountAnalyzeTab' },
-  { id: 'benchmark', icon: '🏆', labelKey: 'tab_benchmark', loader: () => import('./tabs/benchmark-tab.js'),  mountName: 'mountBenchmarkTab' },
-  { id: 'generate',  icon: '✨', labelKey: 'tab_generate',  loader: () => import('./tabs/generate-tab.js'),   mountName: 'mountGenerateTab' },
-  { id: 'learning',  icon: '📚', labelKey: 'tab_learning',  loader: () => import('./tabs/learning-tab.js'),   mountName: 'mountLearningTab' },
-  { id: 'tools',     icon: '🛠️', labelKey: 'tab_tools',     loader: () => import('./tabs/tools-tab.js'),      mountName: 'mount' },
-  { id: 'mypage',    icon: '👤', labelKey: 'tab_mypage',    loader: () => import('./tabs/mypage-tab.js'),     mountName: 'mount' },
+  { id: 'analyze',   iconName: 'chart-bar', labelKey: 'tab_analyze',   loader: () => import('./tabs/analyze-tab.js'),    mountName: 'mountAnalyzeTab' },
+  { id: 'benchmark', iconName: 'trophy',    labelKey: 'tab_benchmark', loader: () => import('./tabs/benchmark-tab.js'),  mountName: 'mountBenchmarkTab' },
+  { id: 'generate',  iconName: 'sparkles',  labelKey: 'tab_generate',  loader: () => import('./tabs/generate-tab.js'),   mountName: 'mountGenerateTab' },
+  { id: 'learning',  iconName: 'book-open', labelKey: 'tab_learning',  loader: () => import('./tabs/learning-tab.js'),   mountName: 'mountLearningTab' },
+  { id: 'tools',     iconName: 'wrench',    labelKey: 'tab_tools',     loader: () => import('./tabs/tools-tab.js'),      mountName: 'mount' },
+  { id: 'mypage',    iconName: 'user',      labelKey: 'tab_mypage',    loader: () => import('./tabs/mypage-tab.js'),     mountName: 'mount' },
 ])
 
 const TAB_IDS = TAB_META.map((t) => t.id)
@@ -175,7 +176,11 @@ function renderLoginButton() {
       },
     },
     [
-      createEl('span', { className: 'bm-header__login-icon', 'aria-hidden': 'true' }, '🔑'),
+      createEl(
+        'span',
+        { className: 'bm-header__login-icon', 'aria-hidden': 'true' },
+        [icon('key', { size: 14, className: 'bm-icon' })],
+      ),
       createEl('span', { className: 'bm-header__login-label', 'data-i18n': 'auth_login_submit' }, '로그인'),
     ],
   )
@@ -264,7 +269,30 @@ function handleHashChange() {
 
 // ─── 부트스트랩 ──────────────────────────────────────────────────────────────
 
+/**
+ * [data-icon] 속성이 있는 모든 span 에 SVG 아이콘을 주입한다.
+ * 이미 SVG 자식이 있으면 건너뛰어 중복 삽입을 방지.
+ * @param {ParentNode} [root]
+ */
+function initTabIcons(root = document) {
+  const spots = root.querySelectorAll('[data-icon]')
+  for (const spot of spots) {
+    if (spot.querySelector('svg')) continue
+    const name = spot.getAttribute('data-icon')
+    if (!name) continue
+    try {
+      const svg = icon(name, { size: 18, className: 'bm-icon bm-tab-icon' })
+      spot.appendChild(svg)
+    } catch (err) {
+      console.warn(`[panel] icon(${name}) 주입 실패:`, err?.message)
+    }
+  }
+}
+
 function bootstrapTabs() {
+  // HTML 의 data-icon 스팟에 SVG 먼저 채운 뒤 이벤트 바인딩.
+  initTabIcons()
+
   const nav = qs('.bm-tabs')
   if (nav) {
     nav.addEventListener('click', handleTabClick)

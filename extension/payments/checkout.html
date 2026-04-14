@@ -11,68 +11,98 @@
     (근거: MV3 기본 extension_pages CSP = "script-src 'self'". 외부 JS 로드 시 심사 리스크.)
   -->
   <style>
-    /* 결제 페이지 인라인 스타일 — 독립 HTML. Tailwind 금지.
-       토큰은 auth.css / mypage.css / admin.css / panel.css 와 동일 변수명. */
+    /* Glassmorphism 결제 페이지.
+       Tailwind 금지. Pretendard · No Italic. No emoji.
+       토큰은 auth/mypage/admin 과 동일 변수명. */
 
     :root {
-      --bm-primary:        #2563eb;
-      --bm-primary-hover:  #1d4ed8;
-      --bm-primary-soft:   #eff6ff;
-      --bm-primary-ring:   rgba(37, 99, 235, 0.2);
-      --bm-accent:         #7c3aed;
+      --bg-mesh:
+        radial-gradient(at 18% 0%, hsla(220, 90%, 72%, 0.26), transparent 55%),
+        radial-gradient(at 82% 12%, hsla(280, 75%, 74%, 0.20), transparent 55%),
+        radial-gradient(at 50% 100%, hsla(198, 85%, 68%, 0.14), transparent 55%),
+        #f5f6fa;
 
-      --bm-bg:             #f8fafc;
-      --bm-surface:        #ffffff;
-      --bm-surface-alt:    #f1f5f9;
+      --glass-bg:        rgba(255, 255, 255, 0.58);
+      --glass-bg-strong: rgba(255, 255, 255, 0.72);
+      --glass-border:    rgba(255, 255, 255, 0.35);
+      --glass-border-strong: rgba(255, 255, 255, 0.55);
+      --glass-shadow:    0 10px 40px rgba(15, 15, 30, 0.08);
+      --glass-shadow-lg: 0 20px 60px rgba(15, 15, 30, 0.12);
 
-      --bm-text:           #0f172a;
-      --bm-text-muted:     #475569;
-      --bm-text-subtle:    #64748b;
-      --bm-text-faint:     #94a3b8;
+      --text-primary:    #1a1a1d;
+      --text-secondary:  #525256;
+      --text-tertiary:   #8a8a8d;
 
-      --bm-border:         #e2e8f0;
-      --bm-border-strong:  #cbd5e1;
+      --brand:           #2563eb;
+      --brand-hover:     #1d4ed8;
+      --brand-soft:      rgba(37, 99, 235, 0.12);
+      --brand-ring:      rgba(37, 99, 235, 0.25);
+      --accent:          #7c3aed;
 
-      --bm-success-bg:     #f0fdf4;
-      --bm-success-fg:     #166534;
-      --bm-danger-bg:      #fef2f2;
-      --bm-danger-fg:      #b91c1c;
-      --bm-danger-border:  #fecaca;
+      --success:         #16a34a;
+      --success-soft:    rgba(22, 163, 74, 0.10);
+      --danger:          #dc2626;
+      --danger-soft:     rgba(220, 38, 38, 0.10);
 
-      --bm-radius:         8px;
-      --bm-radius-card:    12px;
-      --bm-radius-pill:    999px;
-      --bm-shadow-sm:      0 1px 2px rgba(15, 23, 42, 0.04);
-      --bm-shadow-md:      0 4px 16px rgba(15, 23, 42, 0.08);
+      --radius-sm:       8px;
+      --radius-card:     16px;
+      --radius-pill:     999px;
+      --blur:            22px;
 
-      --bm-space-xs:       8px;
-      --bm-space-sm:       12px;
-      --bm-space-md:       16px;
-      --bm-space-lg:       24px;
-      --bm-space-xl:       32px;
+      --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+      --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
 
-      --bm-font: "Pretendard Variable", "Pretendard",
-                 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
-                 "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+      --font: "Pretendard Variable", "Pretendard",
+              "Apple SD Gothic Neo", "Noto Sans KR",
+              -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+      --dur: 160ms;
+      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-mesh:
+          radial-gradient(at 18% 0%, hsla(220, 50%, 30%, 0.32), transparent 55%),
+          radial-gradient(at 82% 12%, hsla(280, 40%, 28%, 0.24), transparent 55%),
+          radial-gradient(at 50% 100%, hsla(198, 55%, 24%, 0.18), transparent 55%),
+          #0f0f12;
+        --glass-bg:        rgba(22, 22, 28, 0.55);
+        --glass-bg-strong: rgba(28, 28, 34, 0.72);
+        --glass-border:    rgba(255, 255, 255, 0.08);
+        --glass-border-strong: rgba(255, 255, 255, 0.14);
+        --glass-shadow:    0 10px 40px rgba(0, 0, 0, 0.45);
+        --glass-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.55);
+        --text-primary:    #f4f4f5;
+        --text-secondary:  #a1a1aa;
+        --text-tertiary:   #71717a;
+        --brand:           #60a5fa;
+        --brand-hover:     #93c5fd;
+        --brand-soft:      rgba(96, 165, 250, 0.15);
+        --brand-ring:      rgba(96, 165, 250, 0.3);
+        --accent:          #c084fc;
+      }
     }
 
     * { box-sizing: border-box; }
+    *, em, i, cite, address, dfn, var { font-style: normal !important; }
 
     html, body {
       margin: 0;
       padding: 0;
-      font-family: var(--bm-font);
-      background: var(--bm-bg);
-      color: var(--bm-text);
+      font-family: var(--font);
+      color: var(--text-primary);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
 
     body {
-      padding: var(--bm-space-lg);
+      padding: var(--sp-5);
       display: flex;
       align-items: flex-start;
       justify-content: center;
+      background: var(--bg-mesh);
+      background-attachment: fixed;
     }
 
     /* ─── 메인 컨테이너 ─── */
@@ -81,7 +111,7 @@
       max-width: 540px;
       display: flex;
       flex-direction: column;
-      gap: var(--bm-space-md);
+      gap: var(--sp-4);
     }
 
     /* ─── 헤더 ─── */
@@ -89,17 +119,17 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      padding-bottom: var(--bm-space-xs);
+      padding-bottom: var(--sp-2);
     }
     .bm-checkout__head h1 {
       margin: 0;
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.01em;
-      color: var(--bm-text);
+      color: var(--text-primary);
       display: flex;
       align-items: center;
-      gap: var(--bm-space-xs);
+      gap: var(--sp-2);
     }
     .bm-checkout__head h1::before {
       content: "B";
@@ -108,73 +138,96 @@
       justify-content: center;
       width: 32px;
       height: 32px;
-      border-radius: var(--bm-radius);
-      background: linear-gradient(135deg, var(--bm-primary) 0%, var(--bm-accent) 100%);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
       color: #ffffff;
       font-weight: 800;
       font-size: 16px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
     }
     .bm-checkout__desc {
       margin: 0;
-      color: var(--bm-text-subtle);
+      color: var(--text-secondary);
       font-size: 13px;
       line-height: 1.55;
     }
 
-    /* ─── 플랜 카드 리스트 ─── */
+    /* ─── 플랜 카드 리스트 (Glass) ─── */
     .bm-checkout__plans {
       display: flex;
       flex-direction: column;
-      gap: var(--bm-space-xs);
+      gap: var(--sp-3);
     }
 
     .bm-checkout__plan {
       display: flex;
       align-items: flex-start;
-      gap: var(--bm-space-sm);
-      padding: var(--bm-space-sm) var(--bm-space-md);
-      background: var(--bm-surface);
-      border: 2px solid var(--bm-border);
-      border-radius: var(--bm-radius-card);
+      gap: var(--sp-3);
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--blur)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
       cursor: pointer;
-      transition: border-color 150ms ease, background 150ms ease,
-                  box-shadow 150ms ease, transform 80ms ease;
-      box-shadow: var(--bm-shadow-sm);
+      position: relative;
+      transition: border-color var(--dur) var(--ease),
+                  background var(--dur) var(--ease),
+                  box-shadow var(--dur) var(--ease),
+                  transform 80ms var(--ease);
+      box-shadow: var(--glass-shadow);
+      overflow: hidden;
     }
 
-    /* hover — 비선택 상태에서의 호버 피드백 */
-    .bm-checkout__plan:hover {
-      border-color: var(--bm-border-strong);
-      box-shadow: var(--bm-shadow-md);
-    }
-
-    .bm-checkout__plan:active {
-      transform: translateY(1px);
-    }
-
-    /* 선택된 플랜 — :has() 로 내부 라디오의 checked 를 감지 */
-    .bm-checkout__plan:has(input[type="radio"]:checked) {
-      border-color: var(--bm-primary);
+    .bm-checkout__plan::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
       background: linear-gradient(
-        180deg,
-        var(--bm-primary-soft) 0%,
-        var(--bm-surface) 30%
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        transparent 100%
       );
-      box-shadow: 0 0 0 4px var(--bm-primary-ring), var(--bm-shadow-md);
+      pointer-events: none;
     }
 
-    /* 포커스 접근성 — 키보드 탭 이동 */
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      .bm-checkout__plan { background: rgba(255, 255, 255, 0.92); }
+      @media (prefers-color-scheme: dark) {
+        .bm-checkout__plan { background: rgba(28, 28, 34, 0.92); }
+      }
+    }
+
+    .bm-checkout__plan:hover {
+      border-color: var(--glass-border-strong);
+      box-shadow: var(--glass-shadow-lg);
+    }
+    .bm-checkout__plan:active { transform: translateY(1px); }
+
+    /* 선택된 플랜 — :has() + gradient ring */
+    .bm-checkout__plan:has(input[type="radio"]:checked) {
+      border-color: transparent;
+      background:
+        linear-gradient(var(--glass-bg-strong), var(--glass-bg-strong)) padding-box,
+        linear-gradient(135deg, var(--brand), var(--accent)) border-box;
+      border: 2px solid transparent;
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow: 0 0 0 4px var(--brand-ring), var(--glass-shadow-lg);
+    }
+
     .bm-checkout__plan:focus-within {
       outline: none;
-      box-shadow: 0 0 0 4px var(--bm-primary-ring);
+      box-shadow: 0 0 0 4px var(--brand-ring), var(--glass-shadow);
     }
 
-    /* 라디오 버튼 스타일 */
     .bm-checkout__plan input[type="radio"] {
       margin-top: 3px;
       width: 18px;
       height: 18px;
-      accent-color: var(--bm-primary);
+      accent-color: var(--brand);
       cursor: pointer;
       flex-shrink: 0;
     }
@@ -186,113 +239,134 @@
       flex-direction: column;
       gap: 2px;
     }
-
     .bm-checkout__plan-name {
       margin: 0;
       font-size: 14px;
       font-weight: 700;
-      color: var(--bm-text);
+      color: var(--text-primary);
       letter-spacing: 0.02em;
       text-transform: uppercase;
     }
-
     .bm-checkout__plan-price {
       margin: 2px 0 0;
       font-size: 18px;
       font-weight: 800;
-      color: var(--bm-text);
+      color: var(--text-primary);
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.01em;
     }
-
-    .bm-checkout__plan-price::after {
-      content: "";
-    }
-
     .bm-checkout__plan-desc {
       margin: 6px 0 0;
-      color: var(--bm-text-muted);
+      color: var(--text-secondary);
       font-size: 12px;
       line-height: 1.5;
     }
 
-    /* ─── 결제 수단 안내 섹션 ─── */
+    /* ─── 결제 수단 섹션 (Glass) ─── */
     .bm-checkout__gateway {
-      padding: var(--bm-space-md);
-      background: var(--bm-surface);
-      border: 1px solid var(--bm-border);
-      border-radius: var(--bm-radius-card);
-      box-shadow: var(--bm-shadow-sm);
+      padding: var(--sp-4);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--blur)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .bm-checkout__gateway::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent, rgba(255, 255, 255, 0.5), transparent
+      );
+      pointer-events: none;
     }
     .bm-checkout__gateway h2 {
       font-size: 13px;
       margin: 0 0 6px;
       font-weight: 700;
-      color: var(--bm-text);
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       gap: 6px;
     }
+    /* "SAFE" 텍스트 배지 (이모지 없음) */
     .bm-checkout__gateway h2::before {
-      content: "🔒";
-      font-size: 14px;
+      content: "SAFE";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      background: var(--success-soft);
+      color: var(--success);
+      border: 1px solid rgba(22, 163, 74, 0.28);
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1;
     }
     .bm-checkout__gateway-options {
       display: flex;
-      gap: var(--bm-space-sm);
+      gap: var(--sp-3);
     }
 
     /* ─── 버튼 ─── */
     .bm-btn {
-      padding: 14px var(--bm-space-md);
-      border-radius: var(--bm-radius);
+      padding: 14px var(--sp-4);
+      border-radius: var(--radius-sm);
       border: 1px solid transparent;
       font-family: inherit;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: background 150ms ease, transform 80ms ease,
-                  box-shadow 150ms ease;
+      transition: background var(--dur) var(--ease),
+                  transform 80ms var(--ease),
+                  box-shadow var(--dur) var(--ease);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: var(--bm-space-xs);
+      gap: var(--sp-2);
     }
     .bm-btn:active:not(:disabled) { transform: translateY(1px); }
     .bm-btn:disabled { opacity: 0.55; cursor: not-allowed; }
     .bm-btn:focus-visible {
       outline: none;
-      box-shadow: 0 0 0 4px var(--bm-primary-ring);
+      box-shadow: 0 0 0 4px var(--brand-ring);
     }
 
     .bm-btn--primary {
-      background: var(--bm-text);
+      background: var(--text-primary);
       color: #ffffff;
-      border-color: var(--bm-text);
-      box-shadow: var(--bm-shadow-md);
+      border-color: var(--text-primary);
+      box-shadow: 0 4px 14px rgba(26, 26, 29, 0.24);
     }
     .bm-btn--primary:hover:not(:disabled) {
-      background: var(--bm-text-muted);
-      border-color: var(--bm-text-muted);
+      background: var(--text-secondary);
+      border-color: var(--text-secondary);
     }
 
-    /* "트레이너 마일스톤 결제창 열기" 버튼 강조 — 브랜드 그라디언트 */
+    /* 메인 CTA 강조 — 그라디언트 + 화살표 */
     .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"] {
-      padding: 16px var(--bm-space-md);
+      padding: 16px var(--sp-4);
       font-size: 15px;
-      background: linear-gradient(135deg, var(--bm-primary) 0%, var(--bm-accent) 100%);
+      background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
       border-color: transparent;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.35);
     }
     .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"]::after {
       content: "→";
       font-size: 18px;
       font-weight: 400;
-      transition: transform 150ms ease;
+      transition: transform var(--dur) var(--ease);
     }
     .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"]:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--bm-primary-hover) 0%, #6d28d9 100%);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+      background: linear-gradient(135deg, var(--brand-hover) 0%, #6d28d9 100%);
+      box-shadow: 0 10px 32px rgba(37, 99, 235, 0.45);
     }
     .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"]:hover:not(:disabled)::after {
       transform: translateX(3px);
@@ -300,29 +374,46 @@
 
     /* ─── 상태 배너 ─── */
     .bm-checkout__status {
-      padding: 10px var(--bm-space-sm);
-      border-radius: var(--bm-radius);
+      padding: 10px var(--sp-3);
+      border-radius: var(--radius-sm);
       font-size: 13px;
-      border: 1px solid transparent;
+      border: 1px solid var(--glass-border);
       line-height: 1.5;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .bm-checkout__status[hidden] { display: none; }
     .bm-checkout__status--info {
-      background: var(--bm-primary-soft);
-      color: #1e40af;
-      border-color: #dbeafe;
+      background: var(--brand-soft);
+      color: var(--brand);
+      border-color: rgba(37, 99, 235, 0.25);
     }
     .bm-checkout__status--error {
-      background: var(--bm-danger-bg);
-      color: var(--bm-danger-fg);
-      border-color: var(--bm-danger-border);
+      background: var(--danger-soft);
+      color: var(--danger);
+      border-color: rgba(220, 38, 38, 0.25);
     }
 
     /* ─── 반응형 ─── */
     @media (max-width: 540px) {
-      body { padding: var(--bm-space-sm); }
+      body { padding: var(--sp-3); }
       .bm-checkout__head h1 { font-size: 20px; }
       .bm-checkout__plan-price { font-size: 16px; }
+    }
+
+    /* ─── 진입 애니메이션 ─── */
+    @media (prefers-reduced-motion: no-preference) {
+      .bm-checkout > * {
+        animation: bmFade 300ms var(--ease) both;
+      }
+      .bm-checkout > *:nth-child(1) { animation-delay: 0ms; }
+      .bm-checkout > *:nth-child(2) { animation-delay: 40ms; }
+      .bm-checkout > *:nth-child(3) { animation-delay: 80ms; }
+      .bm-checkout > *:nth-child(4) { animation-delay: 120ms; }
+      @keyframes bmFade {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
     }
   </style>
 </head>

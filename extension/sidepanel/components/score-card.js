@@ -114,6 +114,7 @@ export function createScoreCard(props) {
 
   const cardClassName = [
     'bm-score-card',
+    'bm-score-card--glass',
     `bm-score-card--${colorKey}`,
     sectionKey ? `bm-score-card--${sectionKey}` : '',
   ].filter(Boolean).join(' ')
@@ -125,6 +126,7 @@ export function createScoreCard(props) {
       'data-score': String(Math.round(score)),
       'data-color': colorKey,
       'data-section': sectionKey,
+      'data-variant': 'glass',
       'aria-label': `${title} ${Math.round(score)}점 (만점 ${maxScore})`,
       tabindex: '0',
     },

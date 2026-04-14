@@ -35,6 +35,7 @@ import { createTotalScoreGauge } from '../components/total-score-gauge.js'
 import { createStatsStrip } from '../components/stats-strip.js'
 import { createRecommendationList } from '../components/recommendation-list.js'
 import { createStructureCard } from '../components/structure-card.js'
+import { icon } from '../components/icons.js'
 
 // ────────────────────────────────────────────────────────────
 // 상수
@@ -285,9 +286,17 @@ function renderEmptyState() {
   if (!refs.body) return
   const empty = createEl(
     'div',
-    { className: 'bm-analyze__empty', 'data-state': 'empty' },
+    {
+      className: 'bm-analyze__empty bm-analyze__empty--glass',
+      'data-state': 'empty',
+      'data-variant': 'glass',
+    },
     [
-      createEl('div', { className: 'bm-analyze__empty-icon', 'aria-hidden': 'true' }, ['🔍']),
+      createEl(
+        'div',
+        { className: 'bm-analyze__empty-icon', 'aria-hidden': 'true' },
+        [icon('search', { size: 36, className: 'bm-icon bm-icon--xl bm-icon--muted' })],
+      ),
       createEl('p', { className: 'bm-analyze__empty-title' }, [
         '네이버 블로그 글 페이지에서 분석을 시작하세요.',
       ]),
@@ -331,7 +340,11 @@ function renderSkeleton() {
  */
 function renderErrorCard(message) {
   if (!refs.body) return
-  const icon = createEl('div', { className: 'bm-error-card__icon', 'aria-hidden': 'true' }, ['⚠️'])
+  const iconWrap = createEl(
+    'div',
+    { className: 'bm-error-card__icon', 'aria-hidden': 'true' },
+    [icon('warning', { size: 32, className: 'bm-icon bm-icon--lg bm-icon--danger' })],
+  )
   const title = createEl('h3', { className: 'bm-error-card__title' }, ['분석에 실패했어요'])
   const body = createEl('p', { className: 'bm-error-card__body' }, [String(message)])
   const retry = createEl(
@@ -346,12 +359,13 @@ function renderErrorCard(message) {
   const card = createEl(
     'section',
     {
-      className: 'bm-error-card',
+      className: 'bm-error-card bm-error-card--glass',
       role: 'alert',
       'aria-live': 'assertive',
       'data-state': 'error',
+      'data-variant': 'glass',
     },
-    [icon, title, body, retry],
+    [iconWrap, title, body, retry],
   )
   clearAndAppend(refs.body, card)
   scrollPanelToTop()
@@ -456,12 +470,16 @@ function buildWarningsBanner(warnings) {
   )
   return createEl(
     'aside',
-    { className: 'bm-analyze__warnings', role: 'note' },
+    {
+      className: 'bm-analyze__warnings bm-analyze__warnings--glass',
+      role: 'note',
+      'data-variant': 'glass',
+    },
     [
       createEl(
         'span',
         { className: 'bm-analyze__warnings-icon', 'aria-hidden': 'true' },
-        ['⚠️'],
+        [icon('warning', { size: 18, className: 'bm-icon bm-icon--warn' })],
       ),
       createEl(
         'ul',

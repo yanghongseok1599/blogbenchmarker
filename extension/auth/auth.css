@@ -1,118 +1,139 @@
 /* extension/auth/auth.css
  *
  * 인증 화면 공통 스타일 — login / signup / reset 3페이지 공유.
- * Tailwind 금지, MV3 CSP(script-src 'self') 호환 로컬 스타일.
- *
- * 디자인 시스템:
- *   토큰은 panel.css(사이드패널) 와 동일 변수명으로 복제 선언한다.
- *   각 페이지는 독립 로드되므로 @import 대신 :root 재선언 전략.
- *   토큰명이 같으면 장차 단일 파일로 추출 가능.
+ * Glassmorphism: 배경 gradient mesh + 카드 backdrop-filter blur + 투명 rgba.
+ * Tailwind 금지. MV3 CSP(script-src 'self') 호환. Pretendard · No Italic.
  */
 
 :root {
-  /* Color — Brand & Semantic */
-  --bm-primary:        #2563eb;
-  --bm-primary-hover:  #1d4ed8;
-  --bm-primary-soft:   #eff6ff;
-  --bm-primary-ring:   rgba(37, 99, 235, 0.2);
-  --bm-accent:         #7c3aed;
+  /* Glass tokens — mesh 배경 + glass 카드 */
+  --bg-mesh:
+    radial-gradient(at 18% 0%, hsla(220,90%,72%,0.28), transparent 55%),
+    radial-gradient(at 82% 12%, hsla(280,75%,74%,0.20), transparent 55%),
+    radial-gradient(at 50% 100%, hsla(198,85%,68%,0.16), transparent 55%),
+    #f5f6fa;
+  --glass-bg: rgba(255,255,255,0.58); --glass-bg-strong: rgba(255,255,255,0.72);
+  --glass-border: rgba(255,255,255,0.35); --glass-border-strong: rgba(255,255,255,0.55);
+  --glass-shadow: 0 10px 40px rgba(15,15,30,0.08);
+  --glass-shadow-lg: 0 20px 60px rgba(15,15,30,0.12);
+  --text-primary: #1a1a1d; --text-secondary: #525256; --text-tertiary: #8a8a8d;
+  --brand: #2563eb; --brand-hover: #1d4ed8;
+  --brand-soft: rgba(37,99,235,0.12); --brand-ring: rgba(37,99,235,0.25);
+  --accent: #7c3aed;
+  --success: #16a34a; --success-soft: rgba(22,163,74,0.10);
+  --warn: #d97706;
+  --danger: #dc2626; --danger-soft: rgba(220,38,38,0.10);
+  --radius-sm: 8px; --radius-card: 16px; --radius-pill: 999px;
+  --blur: 22px;
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
+  --font: "Pretendard Variable", "Pretendard",
+          "Apple SD Gothic Neo", "Noto Sans KR",
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --dur: 160ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-  --bm-bg:             #f8fafc;
-  --bm-surface:        #ffffff;
-  --bm-surface-alt:    #f1f5f9;
-
-  --bm-text:           #0f172a;
-  --bm-text-muted:     #475569;
-  --bm-text-subtle:    #64748b;
-  --bm-text-faint:     #94a3b8;
-
-  --bm-border:         #e2e8f0;
-  --bm-border-strong:  #cbd5e1;
-
-  --bm-success:        #16a34a;
-  --bm-success-bg:     #f0fdf4;
-  --bm-success-border: #bbf7d0;
-  --bm-warn:           #d97706;
-  --bm-warn-bg:        #fffbeb;
-  --bm-warn-border:    #fde68a;
-  --bm-danger:         #dc2626;
-  --bm-danger-bg:      #fef2f2;
-  --bm-danger-border:  #fecaca;
-
-  /* Shape */
-  --bm-radius:         8px;
-  --bm-radius-card:    12px;
-  --bm-radius-pill:    999px;
-
-  /* Elevation */
-  --bm-shadow-sm:      0 1px 2px rgba(15, 23, 42, 0.04);
-  --bm-shadow-md:      0 4px 16px rgba(15, 23, 42, 0.08);
-
-  /* Spacing scale (8/12/16/24/32) */
-  --bm-space-xs:       8px;
-  --bm-space-sm:       12px;
-  --bm-space-md:       16px;
-  --bm-space-lg:       24px;
-  --bm-space-xl:       32px;
-
-  /* Typography */
-  --bm-font: "Pretendard Variable", "Pretendard",
-             -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
-             "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-mesh:
+      radial-gradient(at 18% 0%, hsla(220,50%,30%,0.32), transparent 55%),
+      radial-gradient(at 82% 12%, hsla(280,40%,28%,0.24), transparent 55%),
+      radial-gradient(at 50% 100%, hsla(198,55%,24%,0.18), transparent 55%),
+      #0f0f12;
+    --glass-bg: rgba(22,22,28,0.55); --glass-bg-strong: rgba(28,28,34,0.72);
+    --glass-border: rgba(255,255,255,0.08); --glass-border-strong: rgba(255,255,255,0.14);
+    --glass-shadow: 0 10px 40px rgba(0,0,0,0.45); --glass-shadow-lg: 0 20px 60px rgba(0,0,0,0.55);
+    --text-primary: #f4f4f5; --text-secondary: #a1a1aa; --text-tertiary: #71717a;
+    --brand: #60a5fa; --brand-hover: #93c5fd;
+    --brand-soft: rgba(96,165,250,0.15); --brand-ring: rgba(96,165,250,0.3);
+    --accent: #c084fc;
+  }
 }
 
 * { box-sizing: border-box; }
 
+/* italic 전면 금지 */
+*, em, i, cite, address, dfn, var {
+  font-style: normal !important;
+}
+
 html, body {
   margin: 0;
   padding: 0;
-  font-family: var(--bm-font);
-  background: var(--bm-bg);
-  color: var(--bm-text);
+  font-family: var(--font);
+  color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ────────────────────────────────────────────────────────
- * 레이아웃 — 카드 수직 중앙 배치
- * ──────────────────────────────────────────────────────── */
-
 body.auth-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--bm-space-lg);
+  padding: var(--sp-5);
   min-height: 100vh;
+  background: var(--bg-mesh);
+  background-attachment: fixed;
 }
 
+/* ─── 카드 (Glass) ─── */
 .auth-card {
   width: 100%;
   max-width: 400px;
-  padding: var(--bm-space-xl);
-  background: var(--bm-surface);
-  border: 1px solid var(--bm-border);
-  border-radius: var(--bm-radius-card);
-  box-shadow: var(--bm-shadow-md);
+  padding: var(--sp-6);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glass-shadow);
   display: flex;
   flex-direction: column;
-  gap: var(--bm-space-md);
+  gap: var(--sp-4);
+  position: relative;
+  overflow: hidden;
 }
 
-/* ────────────────────────────────────────────────────────
- * 헤더 — 로고(원형 배지) + 서비스명 + 서브타이틀
- * ──────────────────────────────────────────────────────── */
+/* 카드 상단에 반사광 강조 — glass 질감 강화 */
+.auth-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
 
+/* backdrop-filter 미지원 fallback */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .auth-card {
+    background: rgba(255, 255, 255, 0.92);
+  }
+  @media (prefers-color-scheme: dark) {
+    .auth-card { background: rgba(22, 22, 28, 0.92); }
+  }
+}
+
+/* ─── 헤더 — 로고 + 서비스명 ─── */
 .auth-header {
-  margin: 0 0 var(--bm-space-xs);
+  margin: 0 0 var(--sp-2);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--bm-space-xs);
+  gap: var(--sp-2);
 }
 
-/* 서비스명을 감싸는 H1 앞에 순수 CSS 로고 마크 삽입 */
 .auth-header::before {
   content: "B";
   display: inline-flex;
@@ -120,13 +141,13 @@ body.auth-body {
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: var(--bm-radius);
-  background: linear-gradient(135deg, var(--bm-primary) 0%, var(--bm-accent) 100%);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
   color: #ffffff;
   font-weight: 800;
   font-size: 22px;
   letter-spacing: -0.02em;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
 .auth-title {
@@ -134,53 +155,47 @@ body.auth-body {
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--bm-text);
+  color: var(--text-primary);
 }
 
 .auth-subtitle {
   margin: 0;
   font-size: 13px;
-  color: var(--bm-text-subtle);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
-/* ────────────────────────────────────────────────────────
- * 상단 배너 — 성공 알림 (fixed above form)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 상단 배너 — 성공 알림 ─── */
 .auth-banner {
-  padding: 10px var(--bm-space-sm);
-  border-radius: var(--bm-radius);
+  padding: 10px var(--sp-3);
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
-  display: flex;
-  align-items: center;
-  gap: var(--bm-space-xs);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .auth-banner[hidden] { display: none; }
 
 .auth-banner--success {
-  background: var(--bm-success-bg);
-  border: 1px solid var(--bm-success-border);
-  color: #166534;
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: rgba(22, 163, 74, 0.25);
 }
 
 .auth-banner--info {
-  background: var(--bm-primary-soft);
-  border: 1px solid #dbeafe;
-  color: #1e40af;
+  background: var(--brand-soft);
+  color: var(--brand);
+  border-color: rgba(37, 99, 235, 0.25);
 }
 
-/* ────────────────────────────────────────────────────────
- * 폼 필드
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 폼 ─── */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: var(--bm-space-sm);
+  gap: var(--sp-3);
 }
 
 .auth-field {
@@ -192,180 +207,181 @@ body.auth-body {
 .auth-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--bm-text-muted);
+  color: var(--text-secondary);
 }
 
 .auth-input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--bm-border-strong);
-  border-radius: var(--bm-radius);
+  padding: 11px 12px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 14px;
-  color: var(--bm-text);
-  background: var(--bm-surface);
+  color: var(--text-primary);
   outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  transition: border-color var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease),
+              background var(--dur) var(--ease);
 }
 
-.auth-input::placeholder {
-  color: var(--bm-text-faint);
+@media (prefers-color-scheme: dark) {
+  .auth-input { background: rgba(255, 255, 255, 0.05); }
 }
+
+.auth-input::placeholder { color: var(--text-tertiary); }
 
 .auth-input:hover:not(:disabled):not(:focus) {
-  border-color: var(--bm-text-subtle);
+  border-color: rgba(26, 26, 29, 0.2);
 }
 
-/* Focus ring — 디자인 시스템 강조: 4px 반투명 링 */
 .auth-input:focus {
-  border-color: var(--bm-primary);
-  box-shadow: 0 0 0 4px var(--bm-primary-ring);
+  border-color: var(--brand);
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 0 4px var(--brand-ring);
+}
+
+@media (prefers-color-scheme: dark) {
+  .auth-input:focus { background: rgba(255, 255, 255, 0.08); }
 }
 
 .auth-input:disabled {
-  background: var(--bm-surface-alt);
-  color: var(--bm-text-faint);
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-tertiary);
   cursor: not-allowed;
 }
 
-/* 필드에 에러가 연결된 경우 */
 .auth-field.is-error .auth-input {
-  border-color: var(--bm-danger);
+  border-color: var(--danger);
+  background: var(--danger-soft);
 }
 .auth-field.is-error .auth-input:focus {
   box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
 }
 
-/* 인라인 에러 — 입력 바로 아래 */
-.auth-field-error {
-  margin: 0;
-  font-size: 12px;
-  color: var(--bm-danger);
-  line-height: 1.4;
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-}
-.auth-field-error[hidden] { display: none; }
-
+.auth-field-error,
 .auth-field-hint {
   margin: 0;
   font-size: 12px;
-  color: var(--bm-text-subtle);
   line-height: 1.4;
 }
+.auth-field-error { color: var(--danger); }
+.auth-field-error[hidden] { display: none; }
+.auth-field-hint { color: var(--text-tertiary); }
 
-/* ────────────────────────────────────────────────────────
- * 약관 체크박스
- * ──────────────────────────────────────────────────────── */
-
+/* 약관 체크박스 */
 .auth-terms {
   display: flex;
   align-items: flex-start;
-  gap: var(--bm-space-xs);
+  gap: var(--sp-2);
   font-size: 13px;
-  color: var(--bm-text-muted);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
-
 .auth-terms input[type="checkbox"] {
   margin-top: 3px;
   width: 16px;
   height: 16px;
-  accent-color: var(--bm-primary);
+  accent-color: var(--brand);
   cursor: pointer;
   flex-shrink: 0;
 }
 
-/* ────────────────────────────────────────────────────────
- * 메시지 (폼 하단 폴백; 개별 필드가 아닌 일반 에러용)
- * ──────────────────────────────────────────────────────── */
-
+/* 폼 하단 폴백 메시지 */
 .auth-message {
   font-size: 13px;
   line-height: 1.5;
   padding: 8px 10px;
-  border-radius: var(--bm-radius);
-  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-
 .auth-message[hidden] { display: none; }
-
 .auth-message.is-error {
-  color: var(--bm-danger);
-  background: var(--bm-danger-bg);
-  border-color: var(--bm-danger-border);
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: rgba(220, 38, 38, 0.25);
 }
-
 .auth-message.is-success {
-  color: #166534;
-  background: var(--bm-success-bg);
-  border-color: var(--bm-success-border);
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: rgba(22, 163, 74, 0.25);
 }
-
 .auth-message.is-info {
-  color: #1e40af;
-  background: var(--bm-primary-soft);
-  border-color: #dbeafe;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-color: rgba(37, 99, 235, 0.25);
 }
 
-/* ────────────────────────────────────────────────────────
- * 버튼
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 버튼 (Dark primary / Glass secondary) ─── */
 .auth-btn {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid transparent;
-  border-radius: var(--bm-radius);
+  border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease,
-              opacity 120ms ease, transform 80ms ease;
+  transition: background var(--dur) var(--ease),
+              border-color var(--dur) var(--ease),
+              transform 80ms var(--ease),
+              box-shadow var(--dur) var(--ease);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--bm-space-xs);
+  gap: var(--sp-2);
 }
-
-.auth-btn:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.auth-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
+.auth-btn:active:not(:disabled) { transform: translateY(1px); }
+.auth-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 .auth-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--bm-primary-ring);
+  box-shadow: 0 0 0 4px var(--brand-ring);
 }
 
 .auth-btn--primary {
-  background: var(--bm-primary);
+  background: var(--text-primary);
   color: #ffffff;
-  border-color: var(--bm-primary);
+  border-color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(26, 26, 29, 0.18);
 }
 .auth-btn--primary:hover:not(:disabled) {
-  background: var(--bm-primary-hover);
-  border-color: var(--bm-primary-hover);
+  background: var(--text-secondary);
+  border-color: var(--text-secondary);
+  box-shadow: 0 6px 16px rgba(26, 26, 29, 0.24);
+}
+@media (prefers-color-scheme: dark) {
+  .auth-btn--primary {
+    background: #f4f4f5;
+    color: #1a1a1d;
+    border-color: #f4f4f5;
+  }
+  .auth-btn--primary:hover:not(:disabled) {
+    background: #e4e4e7;
+    border-color: #e4e4e7;
+  }
 }
 
-/* Secondary = Google 로그인 같은 소셜/보조 CTA */
+/* Glass secondary (Google/소셜용) */
 .auth-btn--secondary {
-  background: var(--bm-surface);
-  color: var(--bm-text);
-  border: 1px solid var(--bm-border-strong);
+  background: var(--glass-bg-strong);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border-strong);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
 }
 .auth-btn--secondary:hover:not(:disabled) {
-  background: var(--bm-surface-alt);
-  border-color: var(--bm-text-subtle);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(26, 26, 29, 0.15);
+}
+@media (prefers-color-scheme: dark) {
+  .auth-btn--secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+  }
 }
 
-/* Google 버튼 전용 마크 — 외부 이미지 없이 CSS 로 G 뱃지 */
+/* Google 마크 (CSS-only) */
 .auth-btn--google::before {
   content: "G";
   display: inline-flex;
@@ -373,7 +389,7 @@ body.auth-body {
   justify-content: center;
   width: 18px;
   height: 18px;
-  border-radius: var(--bm-radius-pill);
+  border-radius: var(--radius-pill);
   background:
     conic-gradient(
       from 0deg,
@@ -385,62 +401,49 @@ body.auth-body {
   color: transparent;
   font-size: 0;
   flex-shrink: 0;
-  box-shadow: inset 0 0 0 4px #ffffff;
+  box-shadow: inset 0 0 0 4px var(--glass-bg-strong);
 }
 
-/* Google 버튼 내부 이모지 fallback 아이콘은 숨긴다 — 디자인 통일 */
-.auth-btn--google [aria-hidden="true"] {
-  display: none;
-}
-
-/* ────────────────────────────────────────────────────────
- * Divider — "또는"
- * ──────────────────────────────────────────────────────── */
-
+/* ─── Divider ─── */
 .auth-divider {
   display: flex;
   align-items: center;
-  gap: var(--bm-space-sm);
-  margin: var(--bm-space-xs) 0;
-  color: var(--bm-text-faint);
+  gap: var(--sp-3);
+  margin: var(--sp-2) 0;
+  color: var(--text-tertiary);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-
 .auth-divider::before,
 .auth-divider::after {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--bm-border);
+  background: var(--glass-border-strong);
 }
 
-/* ────────────────────────────────────────────────────────
- * 알림 영역 — 성공/인포 섹션 블록 (이메일 인증 안내 등)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 알림 섹션 (이메일 인증 등) ─── */
 .auth-notice {
-  margin-top: var(--bm-space-xs);
-  padding: var(--bm-space-md);
-  border-radius: var(--bm-radius);
-  border: 1px solid;
+  margin-top: var(--sp-2);
+  padding: var(--sp-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
   font-size: 13px;
   line-height: 1.6;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-
 .auth-notice[hidden] { display: none; }
-
 .auth-notice--info {
-  background: var(--bm-primary-soft);
-  border-color: #dbeafe;
-  color: #1e40af;
+  background: var(--brand-soft);
+  border-color: rgba(37, 99, 235, 0.25);
+  color: var(--brand);
 }
-
 .auth-notice--success {
-  background: var(--bm-success-bg);
-  border-color: var(--bm-success-border);
-  color: #166534;
+  background: var(--success-soft);
+  border-color: rgba(22, 163, 74, 0.25);
+  color: var(--success);
 }
 
 .auth-notice-title {
@@ -448,57 +451,47 @@ body.auth-body {
   font-size: 13px;
   font-weight: 700;
 }
-
 .auth-notice-body {
   margin: 0;
   color: inherit;
   opacity: 0.88;
 }
 
-/* ────────────────────────────────────────────────────────
- * 하단 링크 (로그인↔가입↔재설정 전환)
- * ──────────────────────────────────────────────────────── */
-
+/* ─── 하단 링크 ─── */
 .auth-links {
-  margin: var(--bm-space-xs) 0 0;
+  margin: var(--sp-2) 0 0;
   text-align: center;
   font-size: 13px;
-  color: var(--bm-text-muted);
+  color: var(--text-secondary);
 }
-
 .auth-link {
-  color: var(--bm-primary);
+  color: var(--brand);
   text-decoration: none;
   font-weight: 500;
-  transition: color 120ms ease;
+  transition: color var(--dur) var(--ease);
 }
-
-.auth-link:hover { color: var(--bm-primary-hover); text-decoration: underline; }
+.auth-link:hover { color: var(--brand-hover); text-decoration: underline; }
 .auth-link:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--bm-primary-ring);
+  box-shadow: 0 0 0 3px var(--brand-ring);
   border-radius: 2px;
 }
-
 .auth-links-separator {
-  color: var(--bm-border-strong);
-  margin: 0 var(--bm-space-xs);
+  color: var(--text-tertiary);
+  margin: 0 var(--sp-2);
   user-select: none;
 }
 
-/* ────────────────────────────────────────────────────────
- * 반응형
- * ──────────────────────────────────────────────────────── */
-
+/* 반응형 + 애니메이션 */
 @media (max-width: 420px) {
-  body.auth-body { padding: var(--bm-space-sm); align-items: flex-start; }
-  .auth-card { padding: var(--bm-space-lg) var(--bm-space-md); }
+  body.auth-body { padding: var(--sp-3); align-items: flex-start; }
+  .auth-card { padding: var(--sp-5) var(--sp-4); }
   .auth-title { font-size: 20px; }
 }
-
-/* 다크 모드 준비 — 확장 sidepanel 테마와 톤을 맞춘다. 실제 토글은 후속 phase */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* 미래 대응 placeholder — 현재는 light only */
+@media (prefers-reduced-motion: no-preference) {
+  .auth-card { animation: authFade 300ms var(--ease) both; }
+  @keyframes authFade {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 }

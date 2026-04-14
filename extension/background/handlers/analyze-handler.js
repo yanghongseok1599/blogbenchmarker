@@ -54,34 +54,41 @@ function extractFromDOM() {
 
   const title = titleEl?.textContent?.trim() || ''
 
-  // 구조 분석을 위해 블록 단위로 개행 보존해서 content 추출
+  // ─────────────────────────────────────────────────────────
+  // 본문 블록 추출 — leaf 블록만 선택해 중첩 중복을 원천 차단.
+  // 기존엔 .se-component / .se-module-text 같은 상위 컨테이너도 포함해
+  // 하나의 단락이 2~3번 집계되어 paragraphCount 가 211개까지 부풀었다.
+  // 이제는 실제 말단(리프) 블록만 수집한다.
+  // ─────────────────────────────────────────────────────────
   function extractBlockedText(root) {
     if (!root) return ''
-    const BLOCK_SELECTOR = [
-      'p', 'div.se-text-paragraph', 'div.se-module-text',
-      '.se-component-content', '.se-component',
+    const LEAF_BLOCK_SELECTOR = [
+      'div.se-text-paragraph',   // SmartEditor ONE 문단 (리프)
+      'p:not(:empty)',           // SmartEditor 2.x / legacy 문단
+      'li',                      // 목록 아이템
+      'blockquote',              // 인용
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'li', 'blockquote',
-      'strong', 'b', // 굵은 라인 단독 블록 가능성
+      '.se-quote',               // SmartEditor 인용
     ].join(',')
-    const blocks = root.querySelectorAll(BLOCK_SELECTOR)
+    const blocks = root.querySelectorAll(LEAF_BLOCK_SELECTOR)
     if (blocks.length === 0) {
-      // fallback: textContent 그대로 + innerText 비슷한 분리
       return (root.innerText || root.textContent || '').trim()
     }
+    // 공백 정규화: 연속 공백 → 단일, 양끝 trim.
+    const normalizeWs = (s) => String(s || '').replace(/\s+/g, ' ').trim()
+
     const lines = []
     blocks.forEach((el) => {
-      const t = (el.textContent || '').trim()
+      const t = normalizeWs(el.textContent || '')
       if (t && t.length > 0) lines.push(t)
     })
-    // 중복 제거 (중첩 요소로 인한 같은 텍스트 반복)
+    // 중복 제거 (정규화된 텍스트 기준)
     const seen = new Set()
     const dedup = []
     for (const l of lines) {
-      if (!seen.has(l)) {
-        seen.add(l)
-        dedup.push(l)
-      }
+      if (seen.has(l)) continue
+      seen.add(l)
+      dedup.push(l)
     }
     return dedup.join('\n')
   }
@@ -92,14 +99,71 @@ function extractFromDOM() {
     return { title: '', content: '', images: [], meta: { url: location.href } }
   }
 
-  // 이미지: blog.naver의 CDN 패턴 우선
-  const imgEls = contentEl
-    ? Array.from(contentEl.querySelectorAll('img'))
-    : Array.from(document.querySelectorAll('img'))
-  const images = imgEls
-    .map((img) => ({ src: img.currentSrc || img.src || '', alt: img.alt || '' }))
-    .filter((i) => i.src && !i.src.startsWith('data:'))
-    .slice(0, 100)
+  // ─────────────────────────────────────────────────────────
+  // 이미지 필터링 — 본문 외 이미지(아바타/아이콘/스티커/스프라이트/광고/썸네일)를
+  // 제외해 관련도 있는 본문 이미지만 반환한다.
+  // 기존 60개(아바타·광고 포함) → 평균 ~10개 수준으로 정제.
+  // ─────────────────────────────────────────────────────────
+  const EXCLUDE_ALT_TOKENS = ['이모티콘', '스티커', '이모지']
+  const EXCLUDE_URL_RE = /\/(icon|sticker|profile)\/|sprites?|emoticon/i
+  const MIN_BODY_IMG_SIZE = 100
+
+  function imageDisplaySize(img) {
+    const attrW = parseInt(img.getAttribute('width') || '', 10)
+    const attrH = parseInt(img.getAttribute('height') || '', 10)
+    if (Number.isFinite(attrW) && Number.isFinite(attrH) && attrW > 0 && attrH > 0) {
+      return { w: attrW, h: attrH }
+    }
+    const cw = img.clientWidth || 0
+    const ch = img.clientHeight || 0
+    if (cw > 0 && ch > 0) return { w: cw, h: ch }
+    return { w: img.naturalWidth || 0, h: img.naturalHeight || 0 }
+  }
+
+  function isBodyImage(img) {
+    const src = img.currentSrc || img.src || ''
+    if (!src || src.startsWith('data:')) return false
+
+    const alt = (img.alt || '').trim()
+    for (const bad of EXCLUDE_ALT_TOKENS) {
+      if (alt.includes(bad)) return false
+    }
+    if (EXCLUDE_URL_RE.test(src)) return false
+
+    // 사이즈 검증: 값을 얻은 경우에만 필터 (lazy-load 로 0 이면 trust URL/alt 필터)
+    const { w, h } = imageDisplaySize(img)
+    if (w > 0 && w < MIN_BODY_IMG_SIZE) return false
+    if (h > 0 && h < MIN_BODY_IMG_SIZE) return false
+
+    return true
+  }
+
+  // 우선순위 셀렉터 (본문 이미지로 확인된 슬롯)
+  const PRIORITY_IMG_SELECTOR = [
+    '.se-image img',           // SmartEditor ONE 이미지 컨테이너
+    'img.se-image-resource',   // img 자체가 se-image-resource 클래스
+    '.se-image-resource img',  // 중첩 대비
+    'img.egjs-visible',        // 구버전 slider 이미지
+  ].join(', ')
+
+  let imgPool = contentEl
+    ? Array.from(contentEl.querySelectorAll(PRIORITY_IMG_SELECTOR))
+    : []
+  if (imgPool.length === 0 && contentEl) {
+    // 폴백: contentEl 내 모든 img 중 필터 통과분
+    imgPool = Array.from(contentEl.querySelectorAll('img'))
+  }
+
+  const seenImgSrcs = new Set()
+  const images = []
+  for (const img of imgPool) {
+    if (!isBodyImage(img)) continue
+    const src = img.currentSrc || img.src || ''
+    if (seenImgSrcs.has(src)) continue
+    seenImgSrcs.add(src)
+    images.push({ src, alt: img.alt || '' })
+    if (images.length >= 50) break
+  }
 
   // 태그 / 키워드 추출 (블로그 상단의 태그 영역)
   const tagEls = document.querySelectorAll('.post_tag .item, .wrap_tag a, .tag_area a')
@@ -234,6 +298,20 @@ async function analyzePost(payload) {
     content: best.content,
     images: best.images,
   })
+
+  // 반환 전 sanity 로깅 — DevTools 에서 응답 품질을 빠르게 확인.
+  // 큰 값이 찍히면 오인식 회귀 가능성 (paragraphCount > 100, sectionCount > 10 등).
+  try {
+    const st = structure || {}
+    console.debug('[analyze-handler] counts', {
+      url: tab.url,
+      contentChars: best.content.length,
+      paragraphCount: st.totals?.paragraphCount ?? 0,
+      sectionCount: st.sections?.length ?? 0,
+      imageCount: best.images.length,
+      falsePositive: !!st.falsePositive,
+    })
+  } catch { /* noop */ }
 
   return buildUiShape({
     url: tab.url,

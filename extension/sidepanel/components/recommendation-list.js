@@ -22,19 +22,20 @@
 //   - 카테고리/우선순위는 내부 열거형 — 외부 입력이 아님
 
 import { createEl } from '../../lib/dom-safe.js'
+import { icon } from './icons.js'
 
 // ────────────────────────────────────────────────────────────
 // 상수
 // ────────────────────────────────────────────────────────────
 
-/** 카테고리 표시 순서 + 한국어 라벨 + 아이콘. */
+/** 카테고리 표시 순서 + 한국어 라벨 + SVG 아이콘 이름. */
 const CATEGORY_SPECS = Object.freeze([
-  { key: 'title',       label: '제목',     icon: '🏷',  sectionKey: 'titleSeo' },
-  { key: 'hook',        label: '후킹',     icon: '🎯',  sectionKey: 'hookScore' },
-  { key: 'content',     label: '본문',     icon: '📖',  sectionKey: 'contentSeo' },
-  { key: 'readability', label: '가독성',   icon: '👓',  sectionKey: 'readability' },
-  { key: 'keyword',     label: '키워드',   icon: '🔑',  sectionKey: 'keywordDensity' },
-  { key: 'misc',        label: '기타',     icon: '💡',  sectionKey: null },
+  { key: 'title',       label: '제목',     iconName: 'tag',        sectionKey: 'titleSeo' },
+  { key: 'hook',        label: '후킹',     iconName: 'target',     sectionKey: 'hookScore' },
+  { key: 'content',     label: '본문',     iconName: 'book',       sectionKey: 'contentSeo' },
+  { key: 'readability', label: '가독성',   iconName: 'eye',        sectionKey: 'readability' },
+  { key: 'keyword',     label: '키워드',   iconName: 'key',        sectionKey: 'keywordDensity' },
+  { key: 'misc',        label: '기타',     iconName: 'lightbulb',  sectionKey: null },
 ])
 
 /** 우선순위 정렬 순서 — 표시 시 high → medium → low. */
@@ -72,12 +73,23 @@ export function createRecommendationList(recommendations, options = {}) {
   )
 
   if (items.length === 0) {
+    const emptyIcon = createEl(
+      'span',
+      { className: 'bm-recs__empty-icon', 'aria-hidden': 'true' },
+      [icon('check', { size: 22, className: 'bm-icon bm-icon--success' })],
+    )
     return createEl(
       'section',
-      { className: 'bm-recs bm-recs--empty', role: 'region', 'aria-label': '추천사항' },
+      {
+        className: 'bm-recs bm-recs--glass bm-recs--empty',
+        role: 'region',
+        'aria-label': '추천사항',
+        'data-variant': 'glass',
+      },
       [
+        emptyIcon,
         createEl('p', { className: 'bm-recs__empty-text' }, [
-          '🎉 추천사항이 없습니다. 훌륭한 글이에요!',
+          '추천사항이 없습니다. 훌륭한 글이에요.',
         ]),
       ],
     )
@@ -98,10 +110,11 @@ export function createRecommendationList(recommendations, options = {}) {
   return createEl(
     'section',
     {
-      className: 'bm-recs',
+      className: 'bm-recs bm-recs--glass',
       role: 'region',
       'aria-label': '추천사항 목록',
       'data-count': String(items.length),
+      'data-variant': 'glass',
     },
     [header, ...groups],
   )
@@ -200,7 +213,7 @@ function buildGroup(spec, items) {
       createEl(
         'span',
         { className: 'bm-recs__group-icon', 'aria-hidden': 'true' },
-        [spec.icon],
+        [icon(spec.iconName, { size: 18, className: `bm-icon bm-icon--${spec.key}` })],
       ),
       createEl('span', { className: 'bm-recs__group-label' }, [spec.label]),
       createEl('span', { className: 'bm-recs__group-count' }, [

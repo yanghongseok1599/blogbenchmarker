@@ -1,10 +1,10 @@
 // sidepanel/components/stats-strip.js
 // 분석 결과의 수치 통계를 가로 스트립으로 표시.
 //
-// 예시:
-//   ┌────────────────────────────────────────────────────────┐
-//   │  📝  1,234자   📄  14문장   🖼 6이미지   ⏱ 약 3분          │
-//   └────────────────────────────────────────────────────────┘
+// 예시 (실제 아이콘은 SVG — 미니멀 라인 스타일):
+//   ┌──────────────────────────────────────────────────────────────┐
+//   │  ◫ 1,234자   ¶ 14문장   ▭ 6이미지   ◷ 약 3분                     │
+//   └──────────────────────────────────────────────────────────────┘
 //
 // 입력 shape (handler 의 stats):
 //   {
@@ -23,12 +23,17 @@
 //
 // 안전 규칙:
 //   - createEl / safeText 만 사용 (innerHTML 0건)
-//   - 이모지는 하드코딩 UTF-8. 외부 입력 아님.
+//   - 아이콘은 SVG (createElementNS) — 이모지 의존 0.
+//
+// 고급스러운 외관 — 기본 `bm-stats-strip--glass` modifier 로 panel.css 의
+// backdrop-filter:blur 적용 가능 (CSS 작업은 pane 1).
 //
 // BEM 클래스:
 //   bm-stats-strip / __item / __icon / __value / __label / __divider
+//   variant: bm-stats-strip--glass
 
 import { createEl } from '../../lib/dom-safe.js'
+import { icon } from './icons.js'
 
 // ────────────────────────────────────────────────────────────
 // 상수
@@ -41,7 +46,7 @@ const NBSP = '\u00A0'
 const ITEM_SPECS = Object.freeze([
   {
     key: 'charCount',
-    icon: '📝',
+    iconName: 'text',
     label: '글자수',
     suffix: '자',
     ariaName: '글자수',
@@ -49,7 +54,7 @@ const ITEM_SPECS = Object.freeze([
   },
   {
     key: 'sentenceCount',
-    icon: '📄',
+    iconName: 'paragraph',
     label: '문장수',
     suffix: '문장',
     ariaName: '문장 수',
@@ -57,7 +62,7 @@ const ITEM_SPECS = Object.freeze([
   },
   {
     key: 'imageCount',
-    icon: '🖼',
+    iconName: 'image',
     label: '이미지',
     suffix: '개',
     ariaName: '이미지 수',
@@ -65,7 +70,7 @@ const ITEM_SPECS = Object.freeze([
   },
   {
     key: 'readingTime', // 파생값 — computeReadingTime() 으로 생성
-    icon: '⏱',
+    iconName: 'clock',
     label: '예상 읽기',
     suffix: '분',
     ariaName: '예상 읽기 시간',
@@ -100,9 +105,10 @@ export function createStatsStrip(stats = {}, options = {}) {
   return createEl(
     'section',
     {
-      className: 'bm-stats-strip',
+      className: 'bm-stats-strip bm-stats-strip--glass',
       role: 'group',
       'aria-label': '분석 통계 요약',
+      'data-variant': 'glass',
     },
     withDividers,
   )
@@ -148,10 +154,10 @@ export const __internals = Object.freeze({
  */
 function buildItem(spec, values) {
   const value = values[spec.key]
-  const icon = createEl(
+  const iconWrap = createEl(
     'span',
     { className: 'bm-stats-strip__icon', 'aria-hidden': 'true' },
-    [spec.icon],
+    [icon(spec.iconName, { size: 18, className: 'bm-icon bm-icon--strip' })],
   )
   const valueEl = createEl(
     'strong',
@@ -172,7 +178,7 @@ function buildItem(spec, values) {
       role: 'listitem',
       'aria-label': `${spec.ariaName} ${formatValue(spec, value)}`,
     },
-    [icon, valueEl, labelEl],
+    [iconWrap, valueEl, labelEl],
   )
 }
 
