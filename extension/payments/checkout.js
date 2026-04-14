@@ -20,8 +20,10 @@
 import { getCurrentUser } from '../lib/supabase-client.js'
 import { createEl, safeText, clearAndAppend } from '../lib/dom-safe.js'
 
-// 운영값은 app_settings.billing_url 로 override 가능 (미구현 시 아래 기본값 사용).
-const DEFAULT_BILLING_URL = 'https://billing.blogbenchmarker.example/checkout'
+// 운영값은 app_settings.billing_url 로 override 가능 (009 마이그레이션에서 INSERT).
+// 게이트웨이는 트레이너 마일스톤(trainer_milestone) 단일.
+const DEFAULT_BILLING_URL = 'https://trainermilestone.com/checkout'
+const GATEWAY = 'trainer_milestone'
 
 const PLANS = [
   { id: 'pro',       name: 'PRO',       price: 9900,  desc: '일일 무제한 AI 생성 · 10개 블로그 모니터링' },
@@ -71,12 +73,8 @@ async function handleProceed() {
       return
     }
 
-    const gateway = readGateway()
+    const gateway = GATEWAY
     const plan = selectedPlan
-    if (!['toss', 'portone'].includes(gateway)) {
-      showStatus(statusEl, '결제 수단을 선택해 주세요.', 'error')
-      return
-    }
     if (!['pro', 'unlimited'].includes(plan)) {
       showStatus(statusEl, '플랜을 선택해 주세요.', 'error')
       return
@@ -103,11 +101,6 @@ async function handleProceed() {
   } catch (err) {
     showStatus(statusEl, err?.message || '결제 페이지 이동에 실패했습니다.', 'error')
   }
-}
-
-function readGateway() {
-  const selected = document.querySelector('input[name="gateway"]:checked')
-  return /** @type {HTMLInputElement | null} */ (selected)?.value ?? 'toss'
 }
 
 /**

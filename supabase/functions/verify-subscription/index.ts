@@ -44,12 +44,16 @@ import {
   isRefunded as portoneRefunded,
   PortoneError,
 } from '../_shared/portone.ts'
+import {
+  parseTmWebhook,
+  mapTmStatusToSubscription,
+} from '../_shared/trainer-milestone.ts'
 
 // ─────────────────────────────────────────────────────────────
 // 상수
 // ─────────────────────────────────────────────────────────────
 
-const ALLOWED_GATEWAYS = ['toss', 'portone'] as const
+const ALLOWED_GATEWAYS = ['toss', 'portone', 'trainer_milestone'] as const
 type Gateway = typeof ALLOWED_GATEWAYS[number]
 type Plan = 'free' | 'pro' | 'unlimited'
 const ALLOWED_PLANS: readonly Plan[] = ['free', 'pro', 'unlimited']
@@ -160,7 +164,10 @@ async function handleConfirm(req: Request, body: any): Promise<Response> {
   const paymentId = String(body?.payment_id ?? '').trim()
   const plan = sanitizePlan(body?.plan)
 
-  if (!gateway) return errorResponse('invalid_input', 'gateway 는 toss 또는 portone 이어야 합니다.', 400)
+  if (!gateway) return errorResponse('invalid_input', 'gateway 는 toss/portone/trainer_milestone 이어야 합니다.', 400)
+  if (gateway === 'trainer_milestone') {
+    return errorResponse('mode_not_supported', 'trainer_milestone 은 webhook 모드만 지원합니다.', 400)
+  }
   if (!paymentId) return errorResponse('invalid_input', 'payment_id 가 필요합니다.', 400)
   if (!plan || plan === 'free') return errorResponse('invalid_input', '유효한 유료 plan 이 필요합니다.', 400)
 
@@ -225,6 +232,11 @@ async function handleConfirm(req: Request, body: any): Promise<Response> {
 async function handleWebhook(req: Request, rawBody: string, body: any): Promise<Response> {
   const gateway = sanitizeGateway(body?.gateway ?? detectGatewayFromHeaders(req))
   if (!gateway) return errorResponse('invalid_input', 'gateway 를 식별할 수 없습니다.', 400)
+
+  // 트레이너 마일스톤 전용 경로 — payload 자체가 진실의 원천(별도 API 콜백 없음)
+  if (gateway === 'trainer_milestone') {
+    return await handleTrainerMilestoneWebhook(req, rawBody, body)
+  }
 
   const secret =
     gateway === 'toss'
@@ -362,5 +374,95 @@ function sanitizePlan(v: unknown): Plan | null {
 function detectGatewayFromHeaders(req: Request): Gateway | null {
   if (req.headers.get('x-portone-signature')) return 'portone'
   if (req.headers.get('x-toss-signature')) return 'toss'
+  if (req.headers.get('x-trainer-milestone-signature')) return 'trainer_milestone'
   return null
+}
+
+// ─────────────────────────────────────────────────────────────
+// 트레이너 마일스톤(TM) webhook 처리
+// ─────────────────────────────────────────────────────────────
+//
+// TM 결제창은 외부 호스팅이고, 결제 결과를 다음 형식으로 우리에게 POST 한다:
+//   POST /functions/v1/verify-subscription
+//   X-Signature: HMAC-SHA256(WEBHOOK_SECRET, raw_body) hex
+//   Body: { gateway, payment_id, user_id, plan, amount, status, paid_at, ends_at? }
+//
+// 보안:
+//   - WEBHOOK_SECRET 으로 HMAC 검증 실패 시 401 즉시 반환
+//   - status='paid' 만 plan 혜택 부여, refunded/cancelled 는 즉시 회수
+//   - PLAN_PRICES 와 amount 비교로 위변조 차단
+//   - UNIQUE(gateway, payment_id) 제약 + UPSERT 로 webhook 재시도 idempotent
+
+async function handleTrainerMilestoneWebhook(
+  req: Request,
+  rawBody: string,
+  body: any,
+): Promise<Response> {
+  // 1) HMAC 서명 검증
+  const secret = Deno.env.get('WEBHOOK_SECRET')
+  const signatureHeader =
+    req.headers.get('x-trainer-milestone-signature') ??
+    req.headers.get(DEFAULT_SIGNATURE_HEADER)
+  const sigOk = await verifyHmacSignature(rawBody, signatureHeader, secret)
+  if (!sigOk) {
+    return errorResponse('invalid_signature', 'TM webhook 서명 검증에 실패했습니다.', 401)
+  }
+
+  // 2) payload 형식 검증
+  let payload
+  try {
+    payload = parseTmWebhook(body)
+  } catch (err) {
+    return errorResponse('invalid_payload', String((err as Error).message), 400)
+  }
+
+  // 3) 금액 위변조 검사 (refunded/cancelled 는 plan 혜택 회수라 amount 무시 가능하지만 paid 만 검증)
+  if (payload.status === 'paid') {
+    const expected = PLAN_PRICES[payload.plan]
+    if (typeof expected === 'number' && payload.amount !== expected) {
+      return errorResponse('amount_mismatch', `${payload.plan} 플랜 금액 불일치`, 400, {
+        expected,
+        received: payload.amount,
+      })
+    }
+  }
+
+  const nextStatus = mapTmStatusToSubscription(payload.status)
+
+  // 4) subscriptions UPSERT (UNIQUE(gateway, payment_id) 충돌 시 UPDATE)
+  const db = serviceClient()
+  const endsAt =
+    payload.ends_at ??
+    (payload.status === 'paid'
+      ? new Date(Date.now() + PRO_PERIOD_DAYS * 86400_000).toISOString()
+      : new Date().toISOString())
+
+  const { data: row, error: upsertErr } = await db
+    .from('subscriptions')
+    .upsert(
+      {
+        user_id: payload.user_id,
+        plan: nextStatus === 'active' ? payload.plan : 'free',
+        status: nextStatus,
+        starts_at: payload.paid_at,
+        ends_at: endsAt,
+        gateway: 'trainer_milestone',
+        payment_id: payload.payment_id,
+      },
+      { onConflict: 'gateway,payment_id' },
+    )
+    .select('id, status')
+    .maybeSingle()
+
+  if (upsertErr) {
+    return errorResponse('db_error', '구독 저장 실패', 500, { message: upsertErr.message })
+  }
+
+  // profiles.plan 동기화는 migrations/007 의 트리거가 자동 처리.
+  return okResponse({
+    received: true,
+    matched: true,
+    subscription_id: row?.id,
+    status: row?.status,
+  })
 }
