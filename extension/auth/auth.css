@@ -1,56 +1,186 @@
 /* extension/auth/auth.css
- * 인증 화면 공통 스타일. Tailwind CDN 대체(MV3 CSP 원격 스크립트 차단 대응).
- * 최소 스타일만 수작업 작성 — login/signup/reset 공용. */
+ *
+ * 인증 화면 공통 스타일 — login / signup / reset 3페이지 공유.
+ * Tailwind 금지, MV3 CSP(script-src 'self') 호환 로컬 스타일.
+ *
+ * 디자인 시스템:
+ *   토큰은 panel.css(사이드패널) 와 동일 변수명으로 복제 선언한다.
+ *   각 페이지는 독립 로드되므로 @import 대신 :root 재선언 전략.
+ *   토큰명이 같으면 장차 단일 파일로 추출 가능.
+ */
+
+:root {
+  /* Color — Brand & Semantic */
+  --bm-primary:        #2563eb;
+  --bm-primary-hover:  #1d4ed8;
+  --bm-primary-soft:   #eff6ff;
+  --bm-primary-ring:   rgba(37, 99, 235, 0.2);
+  --bm-accent:         #7c3aed;
+
+  --bm-bg:             #f8fafc;
+  --bm-surface:        #ffffff;
+  --bm-surface-alt:    #f1f5f9;
+
+  --bm-text:           #0f172a;
+  --bm-text-muted:     #475569;
+  --bm-text-subtle:    #64748b;
+  --bm-text-faint:     #94a3b8;
+
+  --bm-border:         #e2e8f0;
+  --bm-border-strong:  #cbd5e1;
+
+  --bm-success:        #16a34a;
+  --bm-success-bg:     #f0fdf4;
+  --bm-success-border: #bbf7d0;
+  --bm-warn:           #d97706;
+  --bm-warn-bg:        #fffbeb;
+  --bm-warn-border:    #fde68a;
+  --bm-danger:         #dc2626;
+  --bm-danger-bg:      #fef2f2;
+  --bm-danger-border:  #fecaca;
+
+  /* Shape */
+  --bm-radius:         8px;
+  --bm-radius-card:    12px;
+  --bm-radius-pill:    999px;
+
+  /* Elevation */
+  --bm-shadow-sm:      0 1px 2px rgba(15, 23, 42, 0.04);
+  --bm-shadow-md:      0 4px 16px rgba(15, 23, 42, 0.08);
+
+  /* Spacing scale (8/12/16/24/32) */
+  --bm-space-xs:       8px;
+  --bm-space-sm:       12px;
+  --bm-space-md:       16px;
+  --bm-space-lg:       24px;
+  --bm-space-xl:       32px;
+
+  /* Typography */
+  --bm-font: "Pretendard Variable", "Pretendard",
+             -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+             "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+}
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
-  background: #f8fafc;
-  color: #0f172a;
+  font-family: var(--bm-font);
+  background: var(--bm-bg);
+  color: var(--bm-text);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ────────────────────────────────────────────────────────
+ * 레이아웃 — 카드 수직 중앙 배치
+ * ──────────────────────────────────────────────────────── */
 
 body.auth-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: var(--bm-space-lg);
+  min-height: 100vh;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
-  padding: 32px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  max-width: 400px;
+  padding: var(--bm-space-xl);
+  background: var(--bm-surface);
+  border: 1px solid var(--bm-border);
+  border-radius: var(--bm-radius-card);
+  box-shadow: var(--bm-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--bm-space-md);
 }
 
+/* ────────────────────────────────────────────────────────
+ * 헤더 — 로고(원형 배지) + 서비스명 + 서브타이틀
+ * ──────────────────────────────────────────────────────── */
+
 .auth-header {
-  margin-bottom: 24px;
+  margin: 0 0 var(--bm-space-xs);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bm-space-xs);
+}
+
+/* 서비스명을 감싸는 H1 앞에 순수 CSS 로고 마크 삽입 */
+.auth-header::before {
+  content: "B";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--bm-radius);
+  background: linear-gradient(135deg, var(--bm-primary) 0%, var(--bm-accent) 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
 .auth-title {
   margin: 0;
   font-size: 22px;
   font-weight: 700;
-  color: #0f172a;
+  letter-spacing: -0.01em;
+  color: var(--bm-text);
 }
 
 .auth-subtitle {
-  margin: 4px 0 0;
+  margin: 0;
   font-size: 13px;
-  color: #64748b;
+  color: var(--bm-text-subtle);
+  line-height: 1.5;
 }
+
+/* ────────────────────────────────────────────────────────
+ * 상단 배너 — 성공 알림 (fixed above form)
+ * ──────────────────────────────────────────────────────── */
+
+.auth-banner {
+  padding: 10px var(--bm-space-sm);
+  border-radius: var(--bm-radius);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: var(--bm-space-xs);
+}
+
+.auth-banner[hidden] { display: none; }
+
+.auth-banner--success {
+  background: var(--bm-success-bg);
+  border: 1px solid var(--bm-success-border);
+  color: #166534;
+}
+
+.auth-banner--info {
+  background: var(--bm-primary-soft);
+  border: 1px solid #dbeafe;
+  color: #1e40af;
+}
+
+/* ────────────────────────────────────────────────────────
+ * 폼 필드
+ * ──────────────────────────────────────────────────────── */
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--bm-space-sm);
 }
 
 .auth-field {
@@ -61,78 +191,147 @@ body.auth-body {
 
 .auth-label {
   font-size: 13px;
-  font-weight: 500;
-  color: #334155;
+  font-weight: 600;
+  color: var(--bm-text-muted);
 }
 
 .auth-input {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  border: 1px solid var(--bm-border-strong);
+  border-radius: var(--bm-radius);
+  font-family: inherit;
   font-size: 14px;
-  color: #0f172a;
-  background: #ffffff;
+  color: var(--bm-text);
+  background: var(--bm-surface);
   outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
 }
 
+.auth-input::placeholder {
+  color: var(--bm-text-faint);
+}
+
+.auth-input:hover:not(:disabled):not(:focus) {
+  border-color: var(--bm-text-subtle);
+}
+
+/* Focus ring — 디자인 시스템 강조: 4px 반투명 링 */
 .auth-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: var(--bm-primary);
+  box-shadow: 0 0 0 4px var(--bm-primary-ring);
 }
 
 .auth-input:disabled {
-  background: #f1f5f9;
-  color: #94a3b8;
+  background: var(--bm-surface-alt);
+  color: var(--bm-text-faint);
   cursor: not-allowed;
 }
+
+/* 필드에 에러가 연결된 경우 */
+.auth-field.is-error .auth-input {
+  border-color: var(--bm-danger);
+}
+.auth-field.is-error .auth-input:focus {
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+}
+
+/* 인라인 에러 — 입력 바로 아래 */
+.auth-field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--bm-danger);
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+.auth-field-error[hidden] { display: none; }
+
+.auth-field-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--bm-text-subtle);
+  line-height: 1.4;
+}
+
+/* ────────────────────────────────────────────────────────
+ * 약관 체크박스
+ * ──────────────────────────────────────────────────────── */
 
 .auth-terms {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--bm-space-xs);
   font-size: 13px;
-  color: #475569;
+  color: var(--bm-text-muted);
   line-height: 1.5;
 }
 
 .auth-terms input[type="checkbox"] {
-  margin-top: 2px;
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--bm-primary);
+  cursor: pointer;
+  flex-shrink: 0;
 }
+
+/* ────────────────────────────────────────────────────────
+ * 메시지 (폼 하단 폴백; 개별 필드가 아닌 일반 에러용)
+ * ──────────────────────────────────────────────────────── */
 
 .auth-message {
   font-size: 13px;
   line-height: 1.5;
-  padding: 0;
-  min-height: 0;
+  padding: 8px 10px;
+  border-radius: var(--bm-radius);
+  border: 1px solid transparent;
 }
 
-.auth-message[hidden] {
-  display: none;
-}
+.auth-message[hidden] { display: none; }
 
 .auth-message.is-error {
-  color: #dc2626;
+  color: var(--bm-danger);
+  background: var(--bm-danger-bg);
+  border-color: var(--bm-danger-border);
 }
 
 .auth-message.is-success {
-  color: #16a34a;
+  color: #166534;
+  background: var(--bm-success-bg);
+  border-color: var(--bm-success-border);
 }
 
 .auth-message.is-info {
-  color: #475569;
+  color: #1e40af;
+  background: var(--bm-primary-soft);
+  border-color: #dbeafe;
 }
+
+/* ────────────────────────────────────────────────────────
+ * 버튼
+ * ──────────────────────────────────────────────────────── */
 
 .auth-btn {
   width: 100%;
   padding: 12px 16px;
-  border: 0;
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--bm-radius);
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 120ms ease, opacity 120ms ease;
+  transition: background 120ms ease, border-color 120ms ease,
+              opacity 120ms ease, transform 80ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bm-space-xs);
+}
+
+.auth-btn:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .auth-btn:disabled {
@@ -140,36 +339,73 @@ body.auth-body {
   cursor: not-allowed;
 }
 
+.auth-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--bm-primary-ring);
+}
+
 .auth-btn--primary {
-  background: #2563eb;
+  background: var(--bm-primary);
   color: #ffffff;
+  border-color: var(--bm-primary);
 }
-
 .auth-btn--primary:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--bm-primary-hover);
+  border-color: var(--bm-primary-hover);
 }
 
+/* Secondary = Google 로그인 같은 소셜/보조 CTA */
 .auth-btn--secondary {
-  background: #ffffff;
-  color: #334155;
-  border: 1px solid #cbd5e1;
-  display: flex;
+  background: var(--bm-surface);
+  color: var(--bm-text);
+  border: 1px solid var(--bm-border-strong);
+}
+.auth-btn--secondary:hover:not(:disabled) {
+  background: var(--bm-surface-alt);
+  border-color: var(--bm-text-subtle);
+}
+
+/* Google 버튼 전용 마크 — 외부 이미지 없이 CSS 로 G 뱃지 */
+.auth-btn--google::before {
+  content: "G";
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--bm-radius-pill);
+  background:
+    conic-gradient(
+      from 0deg,
+      #4285f4 0 25%,
+      #34a853 25% 50%,
+      #fbbc05 50% 75%,
+      #ea4335 75% 100%
+    );
+  color: transparent;
+  font-size: 0;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 4px #ffffff;
 }
 
-.auth-btn--secondary:hover:not(:disabled) {
-  background: #f8fafc;
+/* Google 버튼 내부 이모지 fallback 아이콘은 숨긴다 — 디자인 통일 */
+.auth-btn--google [aria-hidden="true"] {
+  display: none;
 }
+
+/* ────────────────────────────────────────────────────────
+ * Divider — "또는"
+ * ──────────────────────────────────────────────────────── */
 
 .auth-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 24px 0;
-  color: #94a3b8;
+  gap: var(--bm-space-sm);
+  margin: var(--bm-space-xs) 0;
+  color: var(--bm-text-faint);
   font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .auth-divider::before,
@@ -177,59 +413,92 @@ body.auth-body {
   content: "";
   flex: 1;
   height: 1px;
-  background: #e2e8f0;
+  background: var(--bm-border);
 }
 
+/* ────────────────────────────────────────────────────────
+ * 알림 영역 — 성공/인포 섹션 블록 (이메일 인증 안내 등)
+ * ──────────────────────────────────────────────────────── */
+
 .auth-notice {
-  margin-top: 24px;
-  padding: 16px;
-  border-radius: 6px;
+  margin-top: var(--bm-space-xs);
+  padding: var(--bm-space-md);
+  border-radius: var(--bm-radius);
+  border: 1px solid;
   font-size: 13px;
   line-height: 1.6;
 }
 
-.auth-notice[hidden] {
-  display: none;
-}
+.auth-notice[hidden] { display: none; }
 
 .auth-notice--info {
-  background: #eff6ff;
-  border: 1px solid #dbeafe;
+  background: var(--bm-primary-soft);
+  border-color: #dbeafe;
   color: #1e40af;
 }
 
 .auth-notice--success {
-  background: #f0fdf4;
-  border: 1px solid #dcfce7;
+  background: var(--bm-success-bg);
+  border-color: var(--bm-success-border);
   color: #166534;
 }
 
 .auth-notice-title {
   margin: 0 0 4px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .auth-notice-body {
   margin: 0;
+  color: inherit;
+  opacity: 0.88;
 }
 
+/* ────────────────────────────────────────────────────────
+ * 하단 링크 (로그인↔가입↔재설정 전환)
+ * ──────────────────────────────────────────────────────── */
+
 .auth-links {
-  margin-top: 24px;
+  margin: var(--bm-space-xs) 0 0;
   text-align: center;
   font-size: 13px;
-  color: #475569;
+  color: var(--bm-text-muted);
 }
 
 .auth-link {
-  color: #2563eb;
+  color: var(--bm-primary);
   text-decoration: none;
+  font-weight: 500;
+  transition: color 120ms ease;
 }
 
-.auth-link:hover {
-  text-decoration: underline;
+.auth-link:hover { color: var(--bm-primary-hover); text-decoration: underline; }
+.auth-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--bm-primary-ring);
+  border-radius: 2px;
 }
 
 .auth-links-separator {
-  color: #cbd5e1;
-  margin: 0 8px;
+  color: var(--bm-border-strong);
+  margin: 0 var(--bm-space-xs);
+  user-select: none;
+}
+
+/* ────────────────────────────────────────────────────────
+ * 반응형
+ * ──────────────────────────────────────────────────────── */
+
+@media (max-width: 420px) {
+  body.auth-body { padding: var(--bm-space-sm); align-items: flex-start; }
+  .auth-card { padding: var(--bm-space-lg) var(--bm-space-md); }
+  .auth-title { font-size: 20px; }
+}
+
+/* 다크 모드 준비 — 확장 sidepanel 테마와 톤을 맞춘다. 실제 토글은 후속 phase */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 미래 대응 placeholder — 현재는 light only */
+  }
 }

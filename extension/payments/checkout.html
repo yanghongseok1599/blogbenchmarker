@@ -7,27 +7,323 @@
   <!--
     CSP 주의:
     본 페이지는 확장 내부(chrome-extension://) 에서 로드되므로 외부 PG 위젯 스크립트를 직접 포함하지 않는다.
-    실제 결제창은 외부 호스팅된 결제 랜딩(예: https://billing.example.com/checkout) 을 새 탭으로 열어 처리한다.
+    실제 결제창은 외부 호스팅된 결제 랜딩(예: https://trainermilestone.com/checkout) 을 새 탭으로 열어 처리한다.
     (근거: MV3 기본 extension_pages CSP = "script-src 'self'". 외부 JS 로드 시 심사 리스크.)
   -->
-  <!-- checkout.css 는 Phase 8.3(UI 빌더) 에서 추가 예정 -->
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 24px; color: #222; }
-    .bm-checkout { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-    .bm-checkout__head h1 { margin: 0 0 4px; font-size: 20px; }
-    .bm-checkout__desc { margin: 0; color: #666; font-size: 13px; }
-    .bm-checkout__plans { display: flex; flex-direction: column; gap: 8px; }
-    .bm-checkout__plan { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid #eee; border-radius: 8px; cursor: pointer; }
-    .bm-checkout__plan-name { margin: 0 0 2px; font-size: 14px; }
-    .bm-checkout__plan-price { margin: 0; font-weight: 600; }
-    .bm-checkout__plan-desc { margin: 4px 0 0; color: #666; font-size: 12px; }
-    .bm-checkout__gateway h2 { font-size: 14px; margin: 0 0 6px; }
-    .bm-checkout__gateway-options { display: flex; gap: 12px; }
-    .bm-btn { padding: 10px 14px; border-radius: 6px; border: 0; font-size: 14px; cursor: pointer; }
-    .bm-btn--primary { background: #111; color: #fff; }
-    .bm-checkout__status { padding: 8px; border-radius: 6px; font-size: 12px; }
-    .bm-checkout__status--info { background: #eef4ff; color: #1e3a8a; }
-    .bm-checkout__status--error { background: #fef2f2; color: #b91c1c; }
+    /* 결제 페이지 인라인 스타일 — 독립 HTML. Tailwind 금지.
+       토큰은 auth.css / mypage.css / admin.css / panel.css 와 동일 변수명. */
+
+    :root {
+      --bm-primary:        #2563eb;
+      --bm-primary-hover:  #1d4ed8;
+      --bm-primary-soft:   #eff6ff;
+      --bm-primary-ring:   rgba(37, 99, 235, 0.2);
+      --bm-accent:         #7c3aed;
+
+      --bm-bg:             #f8fafc;
+      --bm-surface:        #ffffff;
+      --bm-surface-alt:    #f1f5f9;
+
+      --bm-text:           #0f172a;
+      --bm-text-muted:     #475569;
+      --bm-text-subtle:    #64748b;
+      --bm-text-faint:     #94a3b8;
+
+      --bm-border:         #e2e8f0;
+      --bm-border-strong:  #cbd5e1;
+
+      --bm-success-bg:     #f0fdf4;
+      --bm-success-fg:     #166534;
+      --bm-danger-bg:      #fef2f2;
+      --bm-danger-fg:      #b91c1c;
+      --bm-danger-border:  #fecaca;
+
+      --bm-radius:         8px;
+      --bm-radius-card:    12px;
+      --bm-radius-pill:    999px;
+      --bm-shadow-sm:      0 1px 2px rgba(15, 23, 42, 0.04);
+      --bm-shadow-md:      0 4px 16px rgba(15, 23, 42, 0.08);
+
+      --bm-space-xs:       8px;
+      --bm-space-sm:       12px;
+      --bm-space-md:       16px;
+      --bm-space-lg:       24px;
+      --bm-space-xl:       32px;
+
+      --bm-font: "Pretendard Variable", "Pretendard",
+                 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+                 "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--bm-font);
+      background: var(--bm-bg);
+      color: var(--bm-text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      padding: var(--bm-space-lg);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    /* ─── 메인 컨테이너 ─── */
+    .bm-checkout {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--bm-space-md);
+    }
+
+    /* ─── 헤더 ─── */
+    .bm-checkout__head {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: var(--bm-space-xs);
+    }
+    .bm-checkout__head h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--bm-text);
+      display: flex;
+      align-items: center;
+      gap: var(--bm-space-xs);
+    }
+    .bm-checkout__head h1::before {
+      content: "B";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--bm-radius);
+      background: linear-gradient(135deg, var(--bm-primary) 0%, var(--bm-accent) 100%);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .bm-checkout__desc {
+      margin: 0;
+      color: var(--bm-text-subtle);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    /* ─── 플랜 카드 리스트 ─── */
+    .bm-checkout__plans {
+      display: flex;
+      flex-direction: column;
+      gap: var(--bm-space-xs);
+    }
+
+    .bm-checkout__plan {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--bm-space-sm);
+      padding: var(--bm-space-sm) var(--bm-space-md);
+      background: var(--bm-surface);
+      border: 2px solid var(--bm-border);
+      border-radius: var(--bm-radius-card);
+      cursor: pointer;
+      transition: border-color 150ms ease, background 150ms ease,
+                  box-shadow 150ms ease, transform 80ms ease;
+      box-shadow: var(--bm-shadow-sm);
+    }
+
+    /* hover — 비선택 상태에서의 호버 피드백 */
+    .bm-checkout__plan:hover {
+      border-color: var(--bm-border-strong);
+      box-shadow: var(--bm-shadow-md);
+    }
+
+    .bm-checkout__plan:active {
+      transform: translateY(1px);
+    }
+
+    /* 선택된 플랜 — :has() 로 내부 라디오의 checked 를 감지 */
+    .bm-checkout__plan:has(input[type="radio"]:checked) {
+      border-color: var(--bm-primary);
+      background: linear-gradient(
+        180deg,
+        var(--bm-primary-soft) 0%,
+        var(--bm-surface) 30%
+      );
+      box-shadow: 0 0 0 4px var(--bm-primary-ring), var(--bm-shadow-md);
+    }
+
+    /* 포커스 접근성 — 키보드 탭 이동 */
+    .bm-checkout__plan:focus-within {
+      outline: none;
+      box-shadow: 0 0 0 4px var(--bm-primary-ring);
+    }
+
+    /* 라디오 버튼 스타일 */
+    .bm-checkout__plan input[type="radio"] {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--bm-primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .bm-checkout__plan-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .bm-checkout__plan-name {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--bm-text);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .bm-checkout__plan-price {
+      margin: 2px 0 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--bm-text);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+
+    .bm-checkout__plan-price::after {
+      content: "";
+    }
+
+    .bm-checkout__plan-desc {
+      margin: 6px 0 0;
+      color: var(--bm-text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* ─── 결제 수단 안내 섹션 ─── */
+    .bm-checkout__gateway {
+      padding: var(--bm-space-md);
+      background: var(--bm-surface);
+      border: 1px solid var(--bm-border);
+      border-radius: var(--bm-radius-card);
+      box-shadow: var(--bm-shadow-sm);
+    }
+    .bm-checkout__gateway h2 {
+      font-size: 13px;
+      margin: 0 0 6px;
+      font-weight: 700;
+      color: var(--bm-text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bm-checkout__gateway h2::before {
+      content: "🔒";
+      font-size: 14px;
+    }
+    .bm-checkout__gateway-options {
+      display: flex;
+      gap: var(--bm-space-sm);
+    }
+
+    /* ─── 버튼 ─── */
+    .bm-btn {
+      padding: 14px var(--bm-space-md);
+      border-radius: var(--bm-radius);
+      border: 1px solid transparent;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 150ms ease, transform 80ms ease,
+                  box-shadow 150ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--bm-space-xs);
+    }
+    .bm-btn:active:not(:disabled) { transform: translateY(1px); }
+    .bm-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .bm-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px var(--bm-primary-ring);
+    }
+
+    .bm-btn--primary {
+      background: var(--bm-text);
+      color: #ffffff;
+      border-color: var(--bm-text);
+      box-shadow: var(--bm-shadow-md);
+    }
+    .bm-btn--primary:hover:not(:disabled) {
+      background: var(--bm-text-muted);
+      border-color: var(--bm-text-muted);
+    }
+
+    /* "트레이너 마일스톤 결제창 열기" 버튼 강조 — 브랜드 그라디언트 */
+    .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"] {
+      padding: 16px var(--bm-space-md);
+      font-size: 15px;
+      background: linear-gradient(135deg, var(--bm-primary) 0%, var(--bm-accent) 100%);
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+    .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"]::after {
+      content: "→";
+      font-size: 18px;
+      font-weight: 400;
+      transition: transform 150ms ease;
+    }
+    .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"]:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--bm-primary-hover) 0%, #6d28d9 100%);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+    .bm-checkout > .bm-btn--primary[data-action="proceed-checkout"]:hover:not(:disabled)::after {
+      transform: translateX(3px);
+    }
+
+    /* ─── 상태 배너 ─── */
+    .bm-checkout__status {
+      padding: 10px var(--bm-space-sm);
+      border-radius: var(--bm-radius);
+      font-size: 13px;
+      border: 1px solid transparent;
+      line-height: 1.5;
+    }
+    .bm-checkout__status[hidden] { display: none; }
+    .bm-checkout__status--info {
+      background: var(--bm-primary-soft);
+      color: #1e40af;
+      border-color: #dbeafe;
+    }
+    .bm-checkout__status--error {
+      background: var(--bm-danger-bg);
+      color: var(--bm-danger-fg);
+      border-color: var(--bm-danger-border);
+    }
+
+    /* ─── 반응형 ─── */
+    @media (max-width: 540px) {
+      body { padding: var(--bm-space-sm); }
+      .bm-checkout__head h1 { font-size: 20px; }
+      .bm-checkout__plan-price { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -46,7 +342,7 @@
     <section class="bm-checkout__gateway">
       <h2>결제 수단</h2>
       <p class="bm-checkout__desc">
-        트레이너 마일스톤 안전 결제창에서 카드/계좌이체/간편결제로 진행합니다.
+        트레이너 마일스톤 안전 결제창에서 카드 / 계좌이체 / 간편결제로 진행합니다.
       </p>
     </section>
 
