@@ -1,5 +1,5 @@
 // extension/sidepanel/tabs/tools-tab.js
-// 부가 도구 탭 마운트 진입점. 4개 도구 카드를 각자의 슬롯에 렌더한다.
+// 부가 도구 탭 마운트 진입점. 4개 도구 카드를 세로 스택으로 렌더.
 //
 // panel.js 가 `const { mount } = await import('./tabs/tools-tab.js'); await mount(container)`
 // 패턴으로 호출한다는 관례에 맞춤. destroy() 반환으로 타이머 리스너 정리.
@@ -10,23 +10,27 @@ import { createPomodoroCard, destroyPomodoroCard } from '../tools/pomodoro.js'
 import { createForbiddenWordsCard } from '../tools/forbidden-words.js'
 import { createScreenshotCard } from '../tools/screenshot.js'
 
-async function loadTemplate() {
-  const url = chrome.runtime.getURL('sidepanel/tabs/tools-tab.html')
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`template load failed: ${res.status}`)
-  const html = await res.text()
-  // DOMParser 사용 — innerHTML 미사용. 파싱 단계에서 스크립트 실행 X.
-  const parsed = new DOMParser().parseFromString(html, 'text/html')
-  const root = parsed.body.firstElementChild
-  if (!root) throw new Error('template empty')
-  return /** @type {HTMLElement} */ (document.importNode(root, true))
-}
+function buildRoot() {
+  const head = createEl('header', { className: 'bm-tools__head' }, [
+    createEl('h2', { className: 'bm-tools__title' }, ['부가 도구']),
+    createEl('p', { className: 'bm-tools__hint' }, ['글쓰기 보조 도구 4종']),
+  ])
 
-function showError(root, text) {
-  const el = root.querySelector('#bm-tools-error')
-  if (!el) return
-  safeText(el, text)
-  el.removeAttribute('hidden')
+  const slots = ['counter', 'pomodoro', 'forbidden', 'screenshot'].map((name) =>
+    createEl('div', {
+      className: 'bm-tools__slot',
+      'data-slot': name,
+    }),
+  )
+
+  const errorEl = createEl('p', {
+    id: 'bm-tools-error',
+    className: 'bm-tools__error',
+    role: 'alert',
+    hidden: '',
+  })
+
+  return createEl('section', { className: 'bm-tools' }, [head, ...slots, errorEl])
 }
 
 function slot(root, name) {
@@ -41,17 +45,7 @@ function slot(root, name) {
 export async function mount(container) {
   if (!container) throw new Error('tools-tab: container 필요')
 
-  let root
-  try {
-    root = await loadTemplate()
-  } catch (err) {
-    console.warn('[tools-tab] template load failed')
-    clearAndAppend(
-      container,
-      createEl('div', { className: 'bm-tools__error', role: 'alert' }, '부가 도구를 불러올 수 없습니다.'),
-    )
-    return { destroy: () => clearAndAppend(container) }
-  }
+  const root = buildRoot()
   clearAndAppend(container, root)
 
   /** @type {Array<{ node: HTMLElement, kind: 'pomodoro' | 'other' }>} */
@@ -67,10 +61,14 @@ export async function mount(container) {
         mounted.push({ node, kind })
       }
     } catch (err) {
-      console.warn(`[tools-tab] mount ${slotName} failed`)
+      console.warn(`[tools-tab] mount ${slotName} failed:`, err?.message)
       clearAndAppend(
         target,
-        createEl('p', { className: 'bm-tools__slot-error', role: 'alert' }, `도구 로드 실패: ${slotName}`),
+        createEl(
+          'p',
+          { className: 'bm-tools__slot-error', role: 'alert' },
+          `도구 로드 실패: ${slotName}`,
+        ),
       )
     }
   }

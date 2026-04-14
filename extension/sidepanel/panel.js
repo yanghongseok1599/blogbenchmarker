@@ -299,6 +299,12 @@ function bootstrapTabs() {
     nav.addEventListener('keydown', handleTabKeydown)
   }
 
+  // 헤더의 "마이" 버튼 → mypage 탭 활성화
+  const mypageBtn = document.getElementById('bm-header-mypage')
+  if (mypageBtn) {
+    mypageBtn.addEventListener('click', () => activateTab('mypage'))
+  }
+
   window.addEventListener('hashchange', handleHashChange)
 
   const initial = tabIdFromHash() || DEFAULT_TAB

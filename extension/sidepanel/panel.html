@@ -20,8 +20,20 @@
       />
       <h1 class="bm-title" data-i18n="app_name">BLOG BenchMarker</h1>
     </div>
-    <div class="bm-header__user" id="bm-user-slot" aria-live="polite">
-      <!-- panel.js 가 세션 조회 후 아바타 또는 로그인 버튼을 렌더 -->
+    <div class="bm-header__actions">
+      <button
+        type="button"
+        class="bm-header__mypage"
+        id="bm-header-mypage"
+        aria-label="마이페이지 열기"
+        title="마이페이지"
+      >
+        <span class="bm-header__mypage-icon" data-icon="user" aria-hidden="true"></span>
+        <span class="bm-header__mypage-label" data-i18n="tab_mypage">마이</span>
+      </button>
+      <div class="bm-header__user" id="bm-user-slot" aria-live="polite">
+        <!-- panel.js 가 세션 조회 후 아바타 또는 로그인 버튼을 렌더 -->
+      </div>
     </div>
   </header>
 
@@ -91,19 +103,6 @@
     >
       <span class="bm-tab__icon" data-icon="wrench" aria-hidden="true"></span>
       <span class="bm-tab__label" data-i18n="tab_tools">도구</span>
-    </button>
-    <button
-      class="bm-tab"
-      role="tab"
-      type="button"
-      data-tab="mypage"
-      id="bm-tab-mypage"
-      aria-selected="false"
-      aria-controls="bm-panel-mypage"
-      tabindex="-1"
-    >
-      <span class="bm-tab__icon" data-icon="user" aria-hidden="true"></span>
-      <span class="bm-tab__label" data-i18n="tab_mypage">마이</span>
     </button>
   </nav>
 
