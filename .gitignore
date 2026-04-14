@@ -42,3 +42,4 @@ _workspace/*.log
 *.zip
 *.crx
 *.pem
+.bundle/

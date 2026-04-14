@@ -1,11 +1,11 @@
 // supabase-client.js
 // Supabase JS SDK 초기화 래퍼.
-// - MV3 CSP(script-src 'self') 상 원격 CDN 로드 불가 → UMD 번들은 로컬에 벤더링된 상태를 가정한다.
-//   (예: extension/lib/vendor/supabase.umd.min.js 를 먼저 <script>/importScripts 로 로드)
-// - 로드된 UMD 글로벌(globalThis.supabase.createClient)을 소비해 클라이언트 인스턴스를 만든다.
-// - ES modules (manifest.json service_worker.type = "module") 환경에서 import 해서 사용.
+// - MV3 CSP(script-src 'self') 상 원격 CDN 로드 불가 → ESM 번들을 로컬에 벤더링
+//   (extension/lib/vendor/supabase-esm.js, esbuild 로 @supabase/supabase-js 번들링)
+// - ES modules 환경에서 import 해서 사용 (Service Worker type:"module" + 페이지 <script type="module">).
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './env-config.js'
+import { createClient } from './vendor/supabase-esm.js'
 
 /**
  * chrome.storage.local 을 Supabase Auth storage 로 어댑팅한다.
@@ -51,24 +51,6 @@ if (!hasValidEnv(SUPABASE_URL, SUPABASE_ANON_KEY)) {
     '[supabase-client] env-config.js 가 템플릿 상태입니다. SUPABASE_URL / SUPABASE_ANON_KEY 를 채우세요.'
   )
 }
-
-/**
- * UMD 벤더 번들이 로드되어 globalThis.supabase.createClient 가 존재해야 한다.
- * 로드 전이면 명확한 에러를 던져 원인 파악을 돕는다.
- * @returns {(url: string, key: string, options: object) => any}
- */
-function requireUmdCreateClient() {
-  const umd = /** @type {any} */ (globalThis).supabase
-  if (!umd || typeof umd.createClient !== 'function') {
-    throw new Error(
-      '[supabase-client] Supabase UMD 번들이 로드되지 않았습니다. ' +
-      'lib/vendor/supabase.umd.min.js 를 먼저 import/load 했는지 확인하세요.'
-    )
-  }
-  return umd.createClient
-}
-
-const createClient = requireUmdCreateClient()
 
 /**
  * Supabase 클라이언트 단일 인스턴스.
